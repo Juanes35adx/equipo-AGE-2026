@@ -1,0 +1,50 @@
+[
+  {
+    "title": "Preguntas Frecuentes",
+    "path": "/faqs",
+    "description": "Encuentra respuestas a las dudas más comunes entre primiparos y no primiparos.",
+    "tags": ["faq", "ayuda", "preguntas"]
+  },
+  {
+    "title": "Actividades",
+    "path": "/actividades",
+    "description": "Explora las actividades y eventos disponibles en la u.",
+    "tags": ["eventos", "calendario", "programación"]
+  },
+  {
+    "title": "Perfil de Usuario",
+    "path": "/perfil",
+    "description": "Gestiona tu información personal y accede a SIGAA.",
+    "tags": ["usuario", "cuenta"]
+  },
+  {
+    "title": "Dashboard",
+    "path": "/dashboard",
+    "description": "Accede al panel principal del Asistente General Estudiantil.",
+    "tags": ["inicio", "panel"]
+  },
+  {
+    "title": "Mapa",
+    "path": "/mapa",
+    "description": "Visualiza la ubicación de los puntos de interés y bloques de la u.",
+    "tags": ["ubicacion", "lugares", "mapa"]
+  },
+  {
+    "title": "Foro",
+    "path": "/foro",
+    "description": "Participa en las discusiones de la comunidad y ayuda a otros bolivarianos.",
+    "tags": ["ayuda", "discusiones", "preguntas", "respuestas"]
+  },
+  {
+    "title": "Mentores",
+    "path": "/mentores",
+    "description": "Recibe tutorías y ayuda en trabajos por parte de mentores especializados. ",
+    "tags": ["ayuda", "tutoria", "contactar"]
+  },
+  {
+    "title": "Profesores",
+    "path": "/profesores",
+    "description": "Donde encontrar y contactar a los profesores.",
+    "tags": ["academico", "contactar"]
+  }
+]

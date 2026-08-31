@@ -1,0 +1,128 @@
+@import "tailwindcss";
+
+/* Project's colors for Tailwind*/
+@theme {
+  --color-blanco-bg: #ffffff;
+  --color-gris-bg2: #d4d3d1;
+  --color-griso-prf: #5e5958;
+  --color-rojo-enf: #fd0000;
+  --color-negro-txt: #000000;
+  --color-amarillo-xbtn: #ffa800;
+  --color-rosa-btn: #ff656b;
+  --color-azul-url: #009dcd;
+  --color-rosa-menu: #e8d6d7;
+  --background-image-landing: url(../src/assets/landingbg.png);
+  --background-image-activid: url(../src/assets/actividadesbg.png);
+  --font-size-base: 16px;
+}
+
+/* Header config */
+header {
+  background-color: var(--bg-runtime, var(--color-blanco-bg));
+  width: 100%;
+}
+
+nav, search, form, option, modal, section {
+  background-color: var(--bg-runtime, var(--color-blanco-bg));
+}
+
+body {
+  margin: 0;
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg-runtime, var(--color-blanco-bg));
+  font-size: var(--font-size-base);
+}
+
+.map-wrapper {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.custom-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  /* Anchor the tip of the pin to the coordinate */
+  transform: translateX(-50%);
+}
+
+.marker-pin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  background: #1a73e8;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.custom-marker:hover .marker-pin {
+  transform: rotate(-45deg) scale(1.15);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+}
+
+.marker-icon {
+  display: block;
+  transform: rotate(45deg); /* counter-rotate the emoji */
+  font-size: 16px;
+  line-height: 1;
+}
+
+.marker-label {
+  margin-top: 4px;
+  padding: 2px 6px;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: #1a1a1a;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+}
+
+.custom-marker[data-type="bloque"]  .marker-pin { background: #0d6efd; }
+.custom-marker[data-type="comida"]      .marker-pin { background: #fd7e14; }
+.custom-marker[data-type="parqueaderos"]  .marker-pin { background: #6f42c1; }
+.custom-marker[data-type="porterias"] .marker-pin { background: #dc3545; }
+.custom-marker[data-type="servicios"]      .marker-pin { background: #198754; }
+
+.user-marker {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  transform: translateX(-50%) translateY(-50%);
+}
+
+.user-dot {
+  position: absolute;
+  inset: 3px;
+  background: #4285f4;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.5);
+  z-index: 1;
+}
+
+.user-pulse {
+  position: absolute;
+  inset: -6px;
+  background: rgba(66, 133, 244, 0.25);
+  border-radius: 50%;
+  animation: pulse 2s ease-out infinite;
+}
+
+@keyframes pulse {
+  0%   { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(2.2); opacity: 0; }
+}

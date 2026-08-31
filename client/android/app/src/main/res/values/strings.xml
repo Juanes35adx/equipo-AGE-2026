@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">UPB AGE</string>
+    <string name="title_activity_main">UPB AGE</string>
+    <string name="package_name">edu.upb.age</string>
+    <string name="custom_url_scheme">edu.upb.age</string>
+</resources>
