@@ -18,11 +18,19 @@ export default function Actividades() {
   const [aviso, setAviso] = useState(null);
   const navigate = useNavigate();
 
-  const cargarEventos = () =>
-    getEventos()
-      .then(setEventos)
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false));
+  /** Recarga los eventos y devuelve la lista, para poder refrescar el modal abierto. */
+  const cargarEventos = async () => {
+    try {
+      const datos = await getEventos();
+      setEventos(datos);
+      return datos;
+    } catch (e) {
+      setError(e.message);
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     cargarEventos();
@@ -43,8 +51,11 @@ export default function Actividades() {
         await inscribirse(evento.evento_id);
         setAviso({ tipo: "ok", texto: `Te inscribiste a ${evento.titulo}` });
       }
-      await cargarEventos();
-      closeModal();
+      // El modal se queda abierto mostrando el estado nuevo: tras participar
+      // aparece "Cancelar inscripción", y tras cancelar vuelve a "Participar".
+      const datos = await cargarEventos();
+      const refrescado = datos.find((e) => e.evento_id === evento.evento_id);
+      setEventoActivo(refrescado ?? null);
     } catch (e) {
       setAviso({ tipo: "error", texto: e.message });
     } finally {

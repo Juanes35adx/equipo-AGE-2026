@@ -10,14 +10,19 @@ export async function register({ email, password, fullName, role, programa, seme
   const { data, error } = await supabase.auth.signUp({ email, password });
   if (error) throw new Error(error.message);
 
-  const { error: profileError } = await supabase.from("profiles").insert({
-  profile_id: data.user.id,
-  full_name: fullName,
-  email,
-  role,
-  programa,
-  semestre,
-});
+  // upsert, no insert: un trigger en auth.users ya creó la fila con valores por
+  // defecto, así que aquí solo se completan los datos reales del formulario.
+  const { error: profileError } = await supabase.from("profiles").upsert(
+    {
+      profile_id: data.user.id,
+      full_name: fullName,
+      email,
+      role,
+      programa,
+      semestre,
+    },
+    { onConflict: "profile_id" }
+  );
 
   if (profileError) throw new Error(profileError.message);
   return data;
