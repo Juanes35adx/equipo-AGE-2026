@@ -4,7 +4,7 @@ import Footer from "../components/organisms/Footer";
 import PostContent from "../components/atoms/PostContainer"
 import ThreadModal from "../components/organisms/ModalForo";
 import Answer from "../components/organisms/Ans";                     
-import { getPosts, createPost, getRespuestas, createRespuesta, deleteRespuesta } from "../services/foro.service";
+import { getPosts, createPost, getRespuestas, createRespuesta, getLikes, toggleLike, anidarRespuestas } from "../services/foro.service";
 
 
 const ThumbIcon = () => (
@@ -22,9 +22,14 @@ export default function Foro() {
   const [respuesta, setRespuesta] = useState("");
   const [loading, setLoading] = useState(true);
   const [likes, setLikes] = useState({});
+  const [conteoLikes, setConteoLikes] = useState({});
+  const [respondiendoA, setRespondiendoA] = useState(null);
 
   useEffect(() => {
     getPosts().then(setPosts).finally(() => setLoading(false));
+    getLikes()
+      .then(({ conteo, mios }) => { setConteoLikes(conteo); setLikes(mios); })
+      .catch((e) => console.error("No se pudieron cargar los me gusta:", e.message));
   }, []);
 
   const handleCrearPost = async (e) => {
@@ -45,21 +50,28 @@ const handleVerPost = (post) => {
 const handleResponder = async (e) => {
   e.preventDefault();
   if (!respuesta || !postSeleccionado?.post_id) return;   // ← same guard
-  await createRespuesta(postSeleccionado.post_id, respuesta);
+  // respondiendoA define si la respuesta cuelga de otra respuesta o del post.
+  await createRespuesta(postSeleccionado.post_id, respuesta, respondiendoA?.respuesta_id ?? null);
   setRespuesta("");
+  setRespondiendoA(null);
   getRespuestas(postSeleccionado.post_id).then(setRespuestas);
 };
 
-const handleEliminarRespuesta = async (respuestaId) => {
-  if (!postSeleccionado?.post_id) return;                 // ← same guard
-  await deleteRespuesta(respuestaId);
-  getRespuestas(postSeleccionado.post_id).then(setRespuestas);
-};
-
-
-
-  const handleLike = (postId) => {
-    setLikes((prev) => ({ ...prev, [postId]: !prev[postId] }));
+  /** Alterna el me gusta contra la base de datos y refresca los conteos. */
+  const handleLike = async (postId) => {
+    const yaLeGusta = Boolean(likes[postId]);
+    // Respuesta optimista: la marca cambia de una, sin esperar al servidor.
+    setLikes((prev) => ({ ...prev, [postId]: !yaLeGusta }));
+    try {
+      await toggleLike(postId, yaLeGusta);
+      const { conteo, mios } = await getLikes();
+      setLikes(mios);
+      setConteoLikes(conteo);
+    } catch (e) {
+      // Si falla, se revierte la marca para no mentirle al usuario.
+      setLikes((prev) => ({ ...prev, [postId]: yaLeGusta }));
+      console.error("No se pudo registrar el me gusta:", e.message);
+    }
   };
 
   return (
@@ -146,6 +158,11 @@ const handleEliminarRespuesta = async (respuestaId) => {
                 </div>
 
                 {/* Like button */}
+                {conteoLikes[p.post_id] > 0 && (
+                  <span className="text-sm text-negro-txt/60 shrink-0 self-center mr-1">
+                    {conteoLikes[p.post_id]}
+                  </span>
+                )}
                 <button
                   onClick={() => handleLike(p.post_id)}
                   className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-colors ${
@@ -153,7 +170,7 @@ const handleEliminarRespuesta = async (respuestaId) => {
                       ? "bg-red-600 text-white"
                       : "bg-gray-900 text-white hover:bg-gray-700"
                   }`}
-                  aria-label="Me gusta"
+                  aria-label={likes[p.post_id] ? "Quitar me gusta" : "Me gusta"}
                 >
                   <ThumbIcon />
                 </button>
@@ -177,16 +194,20 @@ const handleEliminarRespuesta = async (respuestaId) => {
               ).toLocaleDateString()}`,
               contenido: postSeleccionado.contenido,
             }}
-            answers={respuestas.map((r) => ({
-              author: r.profiles?.full_name || "?",
-              answer: r.contenido,
-              respuesta_id: r.respuesta_id,
-            }))}
-            onClose={() => setPostSeleccionado(null)}
+            answers={anidarRespuestas(
+              respuestas.map((r) => ({
+                author: r.profiles?.full_name || "?",
+                answer: r.contenido,
+                respuesta_id: r.respuesta_id,
+                respuesta_padre_id: r.respuesta_padre_id,
+              }))
+            )}
+            onClose={() => { setPostSeleccionado(null); setRespondiendoA(null); }}
             onRespond={handleResponder}
             respuesta={respuesta}
             setRespuesta={setRespuesta}
-            onDeleteAnswer={handleEliminarRespuesta}
+            respondiendoA={respondiendoA}
+            setRespondiendoA={setRespondiendoA}
           />
         )}
       </div>

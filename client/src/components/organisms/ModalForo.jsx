@@ -1,8 +1,7 @@
-import { useState } from "react";
 import PostContent from "../atoms/PostContainer";
 import Answer from "../organisms/Ans";
 
-const ThreadModal = ({ post, answers, onClose, onRespond, respuesta, setRespuesta, onDeleteAnswer }) => {
+const ThreadModal = ({ post, answers, onClose, onRespond, respuesta, setRespuesta, respondiendoA, setRespondiendoA }) => {
 
   return (
     <div
@@ -32,10 +31,25 @@ const ThreadModal = ({ post, answers, onClose, onRespond, respuesta, setRespuest
         </modal>
 
         <form onSubmit={onRespond} className="flex flex-col gap-2 mt-4">
+          {/* Aviso de a quién se le está contestando, con opción de volver al post */}
+          {respondiendoA && (
+            <div className="flex items-center justify-between gap-2 bg-gris-bg2 rounded-lg px-3 py-2 text-xs text-negro-txt">
+              <span>
+                Respondiendo a <strong>{respondiendoA.author}</strong>
+              </span>
+              <button
+                type="button"
+                onClick={() => setRespondiendoA(null)}
+                className="bg-transparent border-none text-negro-txt/60 hover:text-negro-txt cursor-pointer underline"
+              >
+                Cancelar
+              </button>
+            </div>
+          )}
           <textarea
             value={respuesta}
             onChange={(e) => setRespuesta(e.target.value)}
-            placeholder="Escribe tu respuesta..."
+            placeholder={respondiendoA ? "Escribe tu respuesta a " + respondiendoA.author + "..." : "Escribe tu respuesta..."}
             required
             className="w-full min-h-20 border border-gray-200 rounded-lg px-3 py-2 text-sm text-negro-txt/80 placeholder-gray-300 resize-y focus:outline-none focus:ring-1 focus:ring-gray-400"
           />
@@ -53,14 +67,19 @@ const ThreadModal = ({ post, answers, onClose, onRespond, respuesta, setRespuest
         <p className="text-[0.9375rem] font-medium text-negro-txt border-negro-txt">Respuestas</p>
 
         <div className="flex flex-col gap-3">
-          {answers.map((a, i) => (
-            <Answer
-              key={i}
-              author={a.author}
-              answer={a.answer}
-              onDelete={() => onDeleteAnswer(a.respuesta_id)}
-            />
-          ))}
+          {answers.length === 0 ? (
+            <p className="text-sm text-negro-txt/60">
+              Todavía no hay respuestas. Sé el primero en responder.
+            </p>
+          ) : (
+            answers.map((a) => (
+              <Answer
+                key={a.respuesta_id}
+                respuesta={a}
+                onResponder={setRespondiendoA}
+              />
+            ))
+          )}
         </div>
 
         <div className="flex justify-center pt-1">
