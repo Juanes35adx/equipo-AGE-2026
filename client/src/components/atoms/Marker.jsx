@@ -1,5 +1,7 @@
+// Las claves se comparan en minuscula contra poi.type, para que los datos
+// puedan venir como "Porteria" o "porteria" sin perder el color.
 const PIN_COLORS = {
-  entrada:  "#0d6efd",
+  porteria:  "#0d6efd",
   comida:      "#fd7e14",
   bloque:  "#6f42c1",
   parqueadero: "#dc3545",
@@ -9,7 +11,8 @@ const PIN_COLORS = {
  
 
 export function createCustomMarker(poi) {
-  const color = PIN_COLORS[poi.type] ?? PIN_COLORS.default;
+  const tipo = String(poi.type ?? "").toLowerCase();
+  const color = PIN_COLORS[tipo] ?? PIN_COLORS.default;
  
   const wrapper = document.createElement("div");
   Object.assign(wrapper.style, {
