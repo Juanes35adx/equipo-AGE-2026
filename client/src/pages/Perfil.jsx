@@ -50,7 +50,7 @@ export default function Perfil() {
               <p className="text-[1rem] md:text-[1.1rem] text-griso-prf leading-relaxed wrap-break-words"><strong>Nombre:</strong> {profile.full_name} </p>
               <p className="text-[1rem] md:text-[1.1rem] text-griso-prf leading-relaxed wrap-break-words"><strong>Correo:</strong> {profile.email} </p>
               <p className="text-[1rem] md:text-[1.1rem] text-griso-prf leading-relaxed wrap-break-words"><strong>Cursando:</strong> {profile.programa} </p>
-              <p className="text-[1rem] md:text-[1.1rem] text-griso-prf leading-relaxed"><strong>ID:</strong> 000558233</p>
+              <p className="text-[1rem] md:text-[1.1rem] text-griso-prf leading-relaxed wrap-break-words"><strong>Semestre:</strong> {profile.semestre ?? "—"} </p>
             </div>
           </div>
           )}

@@ -1,5 +1,4 @@
 import { supabase } from "./supabase";
-import { getSession } from "./auth.service";
 
 export async function getProfile() {
   const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -8,7 +7,7 @@ export async function getProfile() {
 
   const { error, data: profile } = await supabase
     .from('profiles')
-    .select('full_name, email, programa')
+    .select('full_name, email, programa, semestre, role')
     .eq('profile_id', user.id)
     .single();
 
