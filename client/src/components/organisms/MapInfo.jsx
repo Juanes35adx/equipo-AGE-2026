@@ -47,11 +47,10 @@ export default function MAPMap({ onMarkerSelect }) {
         latLngBounds: MAP_BOUNDS,
         strictBounds: false,
       },
-      // Hide all default Google POI labels
-      styles: [
-        { featureType: "poi",    elementType: "labels", stylers: [{ visibility: "off" }] },
-        { featureType: "transit",elementType: "labels", stylers: [{ visibility: "off" }] },
-      ],
+      // Nota: con mapId presente, Google IGNORA la propiedad "styles" del codigo
+      // y aplica el estilo asociado a ese Map ID en Cloud Console. Ocultar los POI
+      // por defecto se configura alli. El mapId no se puede quitar porque los
+      // marcadores usan AdvancedMarkerElement, que lo exige.
     });
 
     mapInstance.current = map;
