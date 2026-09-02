@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { UPB_Markers } from "../../data/markersList";
 import { getUserLocation } from "../../services/location.service";
 import { loadGoogleMaps } from "../../services/map.service";
 import { createCustomMarker } from "../atoms/Marker";
@@ -16,12 +15,20 @@ const MAP_CENTER = {
   lng: (MAP_BOUNDS.east  + MAP_BOUNDS.west)  / 2,
 };
 
-export default function MAPMap({ onMarkerSelect }) {
+export default function MAPMap({ onMarkerSelect, focusPoi, puntos = [] }) {
   const mapRef      = useRef(null);
   const mapInstance = useRef(null);
   const markersRef  = useRef([]);
 
   const [mapsReady, setMapsReady] = useState(false);
+
+  /* Centra el mapa cuando el usuario elige un lugar desde la búsqueda
+     o desde el panel de bloques cercanos. */
+  useEffect(() => {
+    if (!focusPoi?.position || !mapInstance.current) return;
+    mapInstance.current.panTo(focusPoi.position);
+    mapInstance.current.setZoom(19);
+  }, [focusPoi]);
   const [userPos,   setUserPos]   = useState(null);
 
   /* ── 1. Load Google Maps SDK once ───────────────────────────────────── */
@@ -71,7 +78,7 @@ export default function MAPMap({ onMarkerSelect }) {
   function placeMarkers(map) {
     const { AdvancedMarkerElement } = window.google.maps.marker;
 
-    markersRef.current = UPB_Markers.map((poi) => {
+    markersRef.current = puntos.map((poi) => {
       const markerEl = createCustomMarker(poi);
 
       const marker = new AdvancedMarkerElement({
