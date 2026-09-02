@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Header from "../components/organisms/Header2"
 import Footer from "../components/organisms/Footer"
 import {
@@ -14,6 +14,7 @@ export default function Mentores() {
   const [mentorActivo, setMentorActivo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const carruselRef = useRef(null);
 
   useEffect(() => {
     getMentores()
@@ -34,6 +35,18 @@ export default function Mentores() {
 
   const openModal = (mentor) => setMentorActivo(mentor);
   const closeModal = () => setMentorActivo(null);
+
+  /**
+   * Desplaza el carrusel una tarjeta hacia los lados.
+   * @param {number} direccion -1 para ir atrás, 1 para ir adelante.
+   */
+  const desplazarCarrusel = (direccion) => {
+    const carrusel = carruselRef.current;
+    if (!carrusel) return;
+    const tarjeta = carrusel.firstElementChild;
+    const paso = tarjeta ? tarjeta.offsetWidth + 32 : carrusel.clientWidth;
+    carrusel.scrollBy({ left: direccion * paso, behavior: "smooth" });
+  };
 
   const contactarPorTeams = (mentor) => {
     registrarContacto(mentor.mentor_id, "teams");
@@ -147,7 +160,30 @@ export default function Mentores() {
           </p>
         )}
 
-        <div className="flex flex-col md:flex-row gap-8 md:overflow-x-auto py-4 md:snap-x snap-mandatory scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+        {/* Flechas del carrusel: solo tienen sentido si hay más de una tarjeta */}
+        {mentoresFiltrados.length > 1 && (
+          <div className="hidden md:flex justify-end gap-2 mb-2">
+            <button
+              onClick={() => desplazarCarrusel(-1)}
+              aria-label="Ver mentores anteriores"
+              className="w-10 h-10 rounded-full bg-gris-bg2 text-negro-txt text-lg font-bold cursor-pointer border border-[#ddd] transition-colors hover:bg-[#e3001b] hover:text-white"
+            >
+              ◀
+            </button>
+            <button
+              onClick={() => desplazarCarrusel(1)}
+              aria-label="Ver más mentores"
+              className="w-10 h-10 rounded-full bg-gris-bg2 text-negro-txt text-lg font-bold cursor-pointer border border-[#ddd] transition-colors hover:bg-[#e3001b] hover:text-white"
+            >
+              ▶
+            </button>
+          </div>
+        )}
+
+        <div
+          ref={carruselRef}
+          className="flex flex-col md:flex-row gap-8 md:overflow-x-auto py-4 md:snap-x snap-mandatory scroll-smooth scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
+        >
           {mentoresFiltrados.map((mentor) => (
             <div key={mentor.mentor_id} className="min-w-full md:min-w-[20rem] bg-gris-bg2 rounded-xl pt-8 md:pt-12 pb-8 px-6 md:px-14 flex flex-col items-center shadow-[0_4px_15px_rgba(0,0,0,0.05)] transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg snap-start">
               <div className="w-24 h-24 md:w-25 md:h-25 text-[#333] mb-6">
