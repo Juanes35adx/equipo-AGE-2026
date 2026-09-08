@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import Header from "../components/organisms/Header2";
 import Footer from "../components/organisms/Footer";
 import PostContent from "../components/atoms/PostContainer"
@@ -14,9 +15,14 @@ const ThumbIcon = () => (
 );
 
 export default function Foro() {
+  // Si se llega desde "¿Aún con dudas?" en el FAQ, el formulario arranca
+  // precargado con esa pregunta (F-13, escenario ¿Aún con dudas?).
+  const { state } = useLocation();
   const [posts, setPosts] = useState([]);
-  const [titulo, setTitulo] = useState("");
-  const [contenido, setContenido] = useState("");
+  const [titulo, setTitulo] = useState(state?.tituloSugerido ?? "");
+  const [contenido, setContenido] = useState(
+    state?.contenidoSugerido ? "Sobre esto: " + state.contenidoSugerido + "\n\n" : ""
+  );
   const [postSeleccionado, setPostSeleccionado] = useState(null);
   const [respuestas, setRespuestas] = useState([]);
   const [respuesta, setRespuesta] = useState("");

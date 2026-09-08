@@ -32,6 +32,16 @@ export default function FaqsPage() {
                     Ver en página oficial →
                   </a>
                 )}
+                <button
+                  onClick={() =>
+                    navigate("/foro", {
+                      state: { tituloSugerido: f.pregunta, contenidoSugerido: f.respuesta },
+                    })
+                  }
+                  style={styles.dudasBtn}
+                >
+                  ¿Aún con dudas?
+                </button>
               </div>
             ))}
           </div>
@@ -50,5 +60,14 @@ const styles = {
   card: { backgroundColor: "#fff", border: "1px solid #e0e0e0", borderRadius: "12px", padding: "1.5rem" },
   pregunta: { fontWeight: 500, fontSize: "15px", margin: "0 0 8px 0" },
   respuesta: { fontSize: "14px", color: "#555", margin: "0 0 8px 0" },
-  link: { fontSize: "13px", color: "#0066cc" },
+  link: { fontSize: "13px", color: "#0066cc", display: "block", marginBottom: "10px" },
+  dudasBtn: {
+    background: "none",
+    border: "1px solid #ccc",
+    borderRadius: "999px",
+    padding: "6px 14px",
+    fontSize: "12px",
+    color: "#333",
+    cursor: "pointer",
+  },
 };
