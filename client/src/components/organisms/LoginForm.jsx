@@ -3,6 +3,25 @@ import { useNavigate } from "react-router-dom";
 import { login } from "../../services/auth.service";
 import Button from "../atoms/Button";
 
+/**
+ * Traduce los mensajes de error crudos de Supabase Auth al español,
+ * para no mostrarle al usuario texto como "Invalid login credentials".
+ * @param {string} mensaje Mensaje original de la excepción.
+ */
+function traducirErrorLogin(mensaje) {
+  const m = (mensaje ?? "").toLowerCase();
+  if (m.includes("invalid login credentials")) {
+    return "Correo o contraseña incorrectos.";
+  }
+  if (m.includes("email not confirmed")) {
+    return "Debes confirmar tu correo antes de iniciar sesión.";
+  }
+  if (m.includes("failed to fetch") || m.includes("network")) {
+    return "No pudimos conectarnos. Revisa tu conexión a internet.";
+  }
+  return "No pudimos iniciar sesión. Inténtalo de nuevo.";
+}
+
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,7 +37,7 @@ export default function LoginForm() {
       await login(email, password);
       navigate("/dashboard");
     } catch (err) {
-      setError(err.message);
+      setError(traducirErrorLogin(err.message));
     } finally {
       setLoading(false);
     }
