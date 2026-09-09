@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { register } from "../../services/auth.service";
+import { register, logout } from "../../services/auth.service";
 
 export default function RegisterForm() {
   const [form, setForm] = useState({
@@ -37,7 +37,13 @@ export default function RegisterForm() {
         semestre: parseInt(form.semestre),
       });
 
-      navigate("/dashboard");
+      // signUp deja sesión activa (la confirmación por correo está desactivada),
+      // así que se cierra para obligar a iniciar sesión con las credenciales nuevas.
+      await logout();
+
+      navigate("/Login", {
+        state: { mensaje: "Tu cuenta fue creada. Inicia sesión para continuar." },
+      });
     } catch (err) {
       setError(err.message);
     } finally {

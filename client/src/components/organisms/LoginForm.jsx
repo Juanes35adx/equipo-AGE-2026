@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { login } from "../../services/auth.service";
 import Button from "../atoms/Button";
 
@@ -28,6 +28,9 @@ export default function LoginForm() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  // Aviso que llega desde el registro recién completado.
+  const { state } = useLocation();
+  const mensaje = state?.mensaje;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -46,6 +49,12 @@ export default function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full max-w-95 p-8 rounded-xl border border-gray-200 bg-blanco-bg">
     <h2 className="m-0 text-[1.4rem] font-medium text-negro-txt">Iniciar Sesión</h2>
+
+    {mensaje && !error && (
+      <p className="text-[#1b5e20] text-[0.8125rem] m-0 px-2.5 py-2 bg-[#e8f5e9] border border-[#a5d6a7] rounded-md">
+        {mensaje}
+      </p>
+    )}
 
     {error && (
       <p className="text-[#c0392b] text-[0.8125rem] m-0 px-2.5 py-2 bg-blanco-bg rounded-md">
