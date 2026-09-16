@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "../components/organisms/Header2"
 import Footer from "../components/organisms/Footer"
 import {
@@ -16,6 +17,14 @@ export default function Mentores() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const carruselRef = useRef(null);
+  const navigate = useNavigate();
+
+  // El filtro solo lista materias que ya tienen mentor; si la del estudiante no está,
+  // lo llevamos al foro con el asunto precargado.
+  const irAlForo = (materia) =>
+    navigate("/foro", {
+      state: { tituloSugerido: materia ? `Busco ayuda con ${materia}` : "Busco ayuda con una materia" },
+    });
 
   useEffect(() => {
     getMentores()
@@ -128,6 +137,15 @@ export default function Mentores() {
             <p className="text-sm text-negro-txt/60 mt-2">
               Mostrando {mentoresFiltrados.length} de {mentores.length} mentores
             </p>
+            <p className="text-sm text-negro-txt/70 mt-1">
+              ¿No encuentras tu materia?{" "}
+              <button
+                onClick={() => irAlForo()}
+                className="bg-transparent border-none p-0 cursor-pointer font-medium text-negro-txt underline hover:text-[#e3001b]"
+              >
+                Pregúntale a la comunidad en el foro
+              </button>
+            </p>
           </div>
         )}
 
@@ -145,12 +163,20 @@ export default function Mentores() {
             <p className="text-lg text-negro-txt mb-4">
               No hay mentores disponibles para <strong>{materiaSeleccionada}</strong> en este momento.
             </p>
-            <button
-              onClick={() => setMateriaSeleccionada("")}
-              className="bg-[#e3001b] text-white rounded-lg py-3 px-8 text-base font-bold cursor-pointer transition-all duration-300 shadow-md hover:bg-[#bf0015] hover:-translate-y-0.5"
-            >
-              Ver todos los mentores
-            </button>
+            <div className="flex flex-col sm:flex-row justify-center gap-3">
+              <button
+                onClick={() => setMateriaSeleccionada("")}
+                className="bg-[#e3001b] text-white rounded-lg py-3 px-8 text-base font-bold cursor-pointer transition-all duration-300 shadow-md hover:bg-[#bf0015] hover:-translate-y-0.5"
+              >
+                Ver todos los mentores
+              </button>
+              <button
+                onClick={() => irAlForo(materiaSeleccionada)}
+                className="bg-transparent text-negro-txt rounded-lg py-3 px-8 text-base font-bold cursor-pointer border border-[#ccc] transition-all duration-300 hover:bg-blanco-bg"
+              >
+                Preguntar en el foro
+              </button>
+            </div>
           </div>
         )}
 
