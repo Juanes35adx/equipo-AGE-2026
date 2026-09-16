@@ -206,7 +206,7 @@ Como usuario de AGE, quiero consultar una sección de preguntas frecuentes, para
 
 - ✔ Listado de preguntas frecuentes agrupadas por categoría
 - ✔ La respuesta se muestra siempre visible bajo cada pregunta (sin acordeón, igual que el diseño)
-- ✔ Cada respuesta incluye enlace a la fuente oficial de la UPB — las 10 preguntas de la base de datos tienen `link_oficial`. **Corregido el 16/09/2026:** 7 de los 10 enlaces apuntaban a páginas inexistentes de upb.edu.co (el sitio responde código 200 incluso en su página de "no existe", así que el error no era obvio) y 1 apuntaba a un subdominio que no resuelve (`biblioteca.upb.edu.co`); se verificó cada URL contra el contenido real de la página y se reemplazaron las 8 por enlaces vigentes de la sede Medellín
+- ✔ Cada respuesta incluye enlace a la fuente oficial de la UPB — las 10 preguntas de la base de datos tienen `link_oficial`. **Corregido el 16/09/2026:** 7 de los 10 enlaces apuntaban a páginas inexistentes de upb.edu.co (el sitio responde código 200 incluso en su página de "no existe", así que el error no era obvio) y 1 apuntaba a un subdominio que no resuelve (`biblioteca.upb.edu.co`); se verificó cada URL contra el contenido real de la página y se reemplazaron las 8 por enlaces vigentes de la sede Medellín. La pregunta "¿Cómo cancelo una materia?" también se reescribió como "¿Me devuelven el dinero si cancelo una materia?", porque su enlace real habla del reembolso (90% dentro de la primera semana de clases) y no del trámite en SIGAA
 - ✔ Orden de las preguntas configurable desde la base de datos (columna `orden`)
 - ✔ Contenido cargado dinámicamente desde la tabla `faqs`, sin estar quemado en el código
 
