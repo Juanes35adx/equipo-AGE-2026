@@ -5,6 +5,7 @@ import {
   getMentores,
   getMaterias,
   construirEnlaceTeams,
+  construirEnlaceOutlook,
   registrarContacto,
 } from "../services/mentores.service";
 
@@ -55,7 +56,7 @@ export default function Mentores() {
 
   const contactarPorCorreo = (mentor) => {
     registrarContacto(mentor.mentor_id, "correo");
-    window.location.href = `mailto:${mentor.email_institucional}`;
+    window.open(construirEnlaceOutlook(mentor.email_institucional, mentor.materia), "_blank");
   };
 
   return (

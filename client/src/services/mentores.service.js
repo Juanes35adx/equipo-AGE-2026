@@ -36,6 +36,21 @@ export function construirEnlaceTeams(email) {
 }
 
 /**
+ * Construye el enlace para redactar un correo en Outlook web (cuentas Office 365 de la UPB).
+ * Se usa en vez de mailto: porque mailto depende de que haya un cliente de correo instalado.
+ * @param {string} email Correo institucional del mentor.
+ * @param {string} materia Materia del mentor, para prellenar el asunto.
+ * @returns {string} URL de redacción en outlook.office.com.
+ */
+export function construirEnlaceOutlook(email, materia) {
+  const params = new URLSearchParams({
+    to: email,
+    subject: `Mentoría AGE - ${materia}`,
+  });
+  return `https://outlook.office.com/mail/deeplink/compose?${params.toString()}`;
+}
+
+/**
  * Registra el evento "contacto iniciado" para poder medir el uso de la mentoría.
  * No interrumpe el flujo del usuario si falla: el contacto debe abrirse igual.
  * @param {string} mentorId Identificador del mentor contactado.
