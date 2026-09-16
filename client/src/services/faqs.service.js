@@ -42,3 +42,31 @@ export function agruparPorCategoria(faqs) {
 
   return [...grupos.values()];
 }
+
+/** Pasa a minúsculas y quita tildes, para que "matricula" encuentre "Matrícula". */
+function normalizar(texto) {
+  return (texto ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
+
+/**
+ * Filtra las preguntas por texto (en la pregunta o la respuesta) y por categoría.
+ *
+ * @param {Array} faqs Preguntas tal como las devuelve getFaqs().
+ * @param {string} texto Lo que escribió el usuario; vacío no filtra.
+ * @param {string} categoria Categoría elegida; vacío muestra todas.
+ * @returns {Array} Preguntas que cumplen ambos filtros, en el mismo orden.
+ */
+export function filtrarFaqs(faqs, texto, categoria) {
+  const busqueda = normalizar(texto).trim();
+  return faqs.filter((f) => {
+    const coincideCategoria = !categoria || (f.categoria ?? "otros") === categoria;
+    const coincideTexto =
+      !busqueda ||
+      normalizar(f.pregunta).includes(busqueda) ||
+      normalizar(f.respuesta).includes(busqueda);
+    return coincideCategoria && coincideTexto;
+  });
+}
