@@ -1,5 +1,4 @@
 import NewsCard from "../atoms/NewsCard"
-import { useState } from "react";
 
 const DEFAULT_NEWS = [
   {
@@ -29,7 +28,7 @@ export default function NewsCarousel({ items = DEFAULT_NEWS }) {
     <section className="px-5 pt-6 pb-2">
       <h2 className="text-lg font-bold text-negro-txt mb-4">Novedades - Noticias</h2>
       <div
-        className="flex gap-3 overflow-x-auto pb-2"
+        className="flex gap-4 overflow-x-auto pb-2 snap-x"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
         {items.map((item, i) => (

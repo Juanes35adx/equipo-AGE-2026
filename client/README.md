@@ -230,3 +230,30 @@ Local data (not in the DB):
 - All Supabase keys must use the `VITE_` prefix to be accessible in the browser via `import.meta.env`.
 - Auth sessions are managed automatically by the Supabase client library — the JWT is issued and signed by Supabase, stored in `localStorage`, and attached to every request by the SDK. No token handling exists in this codebase.
 - Email confirmation is **disabled** in the Supabase project, so `signUp()` returns an active session immediately. Registration explicitly calls `logout()` before redirecting to the login screen.
+
+---
+
+## Sprint 1 — code traceability 🧭
+
+> Sprint scope only (Auth, access & home). For the full acceptance criteria of each story, see the **"Sprint 1"** section in the repo root `README.md` — nothing below duplicates it.
+
+| HU | Route(s) | Pages / components | Service / data |
+|---|---|---|---|
+| HU-31 Welcome | `/` | `pages/Landing.jsx`, `IniHeader`, `atoms/Card`, `Button` | — |
+| HU-32 Global header | all | `organisms/Header2.jsx` (full) / `organisms/IniHeader.jsx` (reduced), `atoms/AccessButton` | — |
+| HU-33 Footer | all | `organisms/Footer.jsx` | — |
+| HU-34 Side menu | global | `organisms/Menu.jsx`, `context/MenuContext`, `App.jsx` | `auth.service.js` (`logout`) |
+| HU-18 Sign up | `/register` | `pages/Register.jsx`, `organisms/RegisterForm.jsx` | `auth.service.js` (`register`), `data/careerList.json` (26 programs dropdown) |
+| HU-01 Login | `/Login` | `pages/Login.jsx`, `organisms/LoginForm.jsx` | `auth.service.js` (`login`) |
+| HU-02 Logout | `/LogOut`, `/perfil` | `pages/LogOut.jsx`, `pages/Perfil.jsx`, `Menu`, `routes/ProtectedRoute.jsx` | `auth.service.js` (`logout`, `getSession`) |
+| HU-19 Home + news | `/dashboard` | `pages/Dashboard.jsx`, `organisms/Carousel.jsx`, `atoms/NewsCard.jsx` | — |
+| HU-20 Quick access | `/dashboard`, `/buscar` | `organisms/QuickAccess.jsx`, `atoms/DashButton.jsx`, `pages/Buscar.jsx`, `organisms/Search.jsx` | — |
+
+### Sprint 1 test coverage 🧪
+
+The existing smoke tests (`npm test`, with `TEST_EMAIL` / `TEST_PASSWORD` in `client/.env`) cover HU-01 and HU-02: valid login → dashboard, invalid login → error, protected route without session → landing, menu logout → `/LogOut`, dashboard after logout → landing.
+
+### Known Sprint 1 gaps ⚠️
+
+1. **HU-01:** no first-party bcrypt/JWT/captcha code — password hashing and the session JWT are handled by Supabase Auth (see Notes above); the login form has no captcha.
+2. **HU-20:** the search box inside the quick-access block does not navigate with the entered term (`AppRouter.jsx` passes no `onSearch` to `Dashboard`); full search works from `/buscar`.

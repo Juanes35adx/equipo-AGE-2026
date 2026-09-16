@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { register, logout } from "../../services/auth.service";
+import careerList from "../../data/careerList.json";
 
 export default function RegisterForm() {
   const [form, setForm] = useState({
@@ -138,14 +139,20 @@ export default function RegisterForm() {
           Programa académico
         </label>
 
-        <input
+        <select
           name="programa"
           value={form.programa}
           onChange={handleChange}
-          placeholder="Ej: Ingeniería de Sistemas"
           required
-          className="rounded-lg border border-[#ccc] px-3 py-2.5 text-[0.9375rem] outline-none placeholder-negro-txt/70"
-        />
+          className="rounded-lg border border-[#ccc] px-3 py-2.5 text-[0.9375rem] outline-none text-negro-txt/70"
+        >
+          <option value="">Selecciona tu programa</option>
+          {careerList.map((carrera) => (
+            <option key={carrera} value={carrera}>
+              {carrera}
+            </option>
+          ))}
+        </select>
       </div>
 
       {form.role === "estudiante" && (
