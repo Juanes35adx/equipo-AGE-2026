@@ -151,8 +151,11 @@ const handleResponder = async (e) => {
                 {/* PostContent handles avatar + stacked name */}
                 <div className="flex-1 min-w-0">
                   <PostContent name={p.profiles?.full_name || "?"}>
-                    <p className="text-sm font-medium text-gray-800 leading-snug mb-2">
+                    <p className="text-sm font-medium text-gray-800 leading-snug mb-1">
                       {p.titulo}
+                    </p>
+                    <p className="text-sm text-gray-600 leading-snug mb-2 line-clamp-2">
+                      {p.contenido}
                     </p>
                     <button
                       onClick={() => handleVerPost(p)}
