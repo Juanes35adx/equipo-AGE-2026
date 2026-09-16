@@ -240,14 +240,16 @@ Datos locales (no están en la BD):
 | HU | Ruta(s) | Pages / componentes | Servicio / dato |
 |---|---|---|---|
 | HU-31 Bienvenida | `/` | `pages/Landing.jsx`, `IniHeader`, `atoms/Card`, `Button` | — |
-| HU-32 Encabezado global | todas | `organisms/Header2.jsx` (completo) / `organisms/IniHeader.jsx` (reducido), `atoms/AccessButton` | — |
-| HU-33 Pie de página | todas | `organisms/Footer.jsx` | — |
-| HU-34 Menú lateral | global | `organisms/Menu.jsx`, `context/MenuContext`, `App.jsx` | `auth.service.js` (`logout`) |
+| HU-32 Encabezado global | todas (por página) | `organisms/Header2.jsx` (completo) / `organisms/IniHeader.jsx` (reducido), `atoms/AccessButton` | — |
+| HU-33 Pie de página | todas (por página) | `organisms/Footer.jsx` | — |
+| HU-34 Menú lateral | global (montado una vez) | `organisms/Menu.jsx`, `context/MenuContext`, `App.jsx` | `auth.service.js` (`logout`) |
 | HU-18 Crear cuenta | `/register` | `pages/Register.jsx`, `organisms/RegisterForm.jsx` | `auth.service.js` (`register`), `data/careerList.json` (desplegable de 26 programas) |
 | HU-01 Login | `/Login` | `pages/Login.jsx`, `organisms/LoginForm.jsx` | `auth.service.js` (`login`) |
 | HU-02 Logout | `/LogOut`, `/perfil` | `pages/LogOut.jsx`, `pages/Perfil.jsx`, `Menu`, `routes/ProtectedRoute.jsx` | `auth.service.js` (`logout`, `getSession`) |
 | HU-19 Inicio + novedades | `/dashboard` | `pages/Dashboard.jsx`, `organisms/Carousel.jsx`, `atoms/NewsCard.jsx` | — |
 | HU-20 Accesos rápidos | `/dashboard`, `/buscar` | `organisms/QuickAccess.jsx`, `atoms/DashButton.jsx`, `pages/Buscar.jsx`, `organisms/Search.jsx` | — |
+
+> **"todas (por página)" vs. "global (montado una vez)":** el encabezado y el pie de página aparecen en todas las pantallas, pero cada `page` importa y renderiza su propia copia (`Header2`/`IniHeader` y `Footer`) — es código repetido, no un componente compartido. El menú lateral, en cambio, se monta **una sola vez** en `App.jsx`, fuera del sistema de rutas, y comparte su estado abierto/cerrado con toda la app a través de `MenuContext`. Por eso "global" no significa lo mismo que "todas": una es una instancia única compartida, la otra es la misma pieza repetida en cada página.
 
 ### Cobertura de pruebas del Sprint 1 🧪
 
