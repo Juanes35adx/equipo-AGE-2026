@@ -1,94 +1,94 @@
-# UPB AGE — ASISTENTE GENERAL ESTUDIANTIL (General Student Assistant) 🎓
+# UPB AGE — ASISTENTE GENERAL ESTUDIANTIL 🎓
 
-Web app for new students at **Universidad Pontificia Bolivariana – Medellín**, designed to help them navigate campus life from day one.
-
----
-
-## What's in `/client`? 📁
-
-`/client` contains the entire client-side application. It is a React + Vite single-page app responsible for all UI, routing, authentication flows, and communication with the Supabase backend. It is also the source for the Android build, packaged with Capacitor.
-
-> **Note on `/server`:** the repository has a `/server` folder with an Express skeleton, but it is **not used**. It exposes a single placeholder route and connects to nothing. The project talks to Supabase directly from the client — Supabase *is* the backend.
+Aplicación web para estudiantes nuevos de la **Universidad Pontificia Bolivariana – Medellín**, diseñada para ayudarles a moverse por la vida universitaria desde el primer día.
 
 ---
 
-## Features ✨
+## ¿Qué hay en `/client`? 📁
 
-- **Welcome, Login & Registration** — handled via Supabase Auth. After signing up, the user is redirected to the login screen and must sign in with the new credentials.
-- **Dashboard** — welcome message, news carousel, and quick-access grid to every module
-- **Campus Map** — interactive Google Map with 35 campus locations, live user position, pin legend, in-map search, and nearby blocks
-- **Search** — searches app sections by keyword, with a tag filter (22 tags)
-- **FAQ** — questions loaded from the database, each with an official link and an "¿Aún con dudas?" button that jumps to the forum with the question pre-filled
-- **Forum** — students post questions, reply, reply to replies (nested), and like posts
-- **Mentors** — directory filterable by subject, contact opens a private Microsoft Teams chat
-- **Activities** — event listing with real seat counts, sign-up and cancellation
-- **Profile** — user data, SIGAA shortcut, and sign-out
-- **Accessibility** — text size (A− / A+) and contrast controls, available from the header on every screen
+`/client` contiene toda la aplicación del lado del cliente. Es una SPA de React + Vite responsable de toda la interfaz, el enrutamiento, los flujos de autenticación y la comunicación con el backend de Supabase. También es el origen de la compilación para Android, empaquetada con Capacitor.
+
+> **Nota sobre `/server`:** el repositorio tiene una carpeta `/server` con un esqueleto de Express, pero **no se usa**. Expone una única ruta de saludo y no se conecta a nada. El proyecto habla directo con Supabase desde el cliente — Supabase *es* el backend.
 
 ---
 
-## Tech Stack 🛠️
+## Funcionalidades ✨
 
-| Layer | Technology |
+- **Bienvenida, inicio de sesión y registro** — gestionados con Supabase Auth. Al crear la cuenta, el usuario es redirigido a la pantalla de login y debe iniciar sesión con las credenciales nuevas.
+- **Dashboard** — mensaje de bienvenida, carrusel de novedades y cuadrícula de accesos rápidos a cada módulo
+- **Mapa del campus** — mapa interactivo de Google con 35 ubicaciones del campus, posición del usuario en vivo, leyenda de pines, búsqueda dentro del mapa y bloques cercanos
+- **Búsqueda** — busca secciones de la app por palabra clave, con filtro de etiquetas (22 etiquetas)
+- **FAQ** — preguntas cargadas desde la base de datos, cada una con un enlace oficial y un botón "¿Aún con dudas?" que lleva al foro con la pregunta precargada
+- **Foro** — los estudiantes publican preguntas, responden, responden a respuestas (anidadas) y dan like a las publicaciones
+- **Mentores** — directorio filtrable por materia, el contacto abre un chat privado de Microsoft Teams
+- **Actividades** — listado de eventos con cupos reales, inscripción y cancelación
+- **Perfil** — datos del usuario, acceso directo a SIGAA y cierre de sesión
+- **Accesibilidad** — controles de tamaño de texto (A− / A+) y contraste, disponibles desde el encabezado en toda pantalla
+
+---
+
+## Stack tecnológico 🛠️
+
+| Capa | Tecnología |
 |---|---|
 | Framework | React 19 + Vite 8 |
-| Routing | react-router-dom |
-| Styling | Tailwind CSS v4 |
-| Mobile | Capacitor 8 (Android) |
-| Maps | Google Maps JavaScript API |
-| Geolocation | `@capacitor/geolocation` |
-| Testing | Playwright (smoke tests) |
+| Enrutamiento | react-router-dom |
+| Estilos | Tailwind CSS v4 |
+| Móvil | Capacitor 8 (Android) |
+| Mapas | Google Maps JavaScript API |
+| Geolocalización | `@capacitor/geolocation` |
+| Pruebas | Playwright (smoke tests) |
 | Linting | ESLint |
-| Auth & Database | Supabase (Auth + PostgreSQL with RLS) |
+| Auth y base de datos | Supabase (Auth + PostgreSQL con RLS) |
 | Runtime | Node.js 24 LTS |
 
-> ⚠️ **Tailwind v4 heads-up:** This project uses **Tailwind CSS v4**, which has significant differences from v3. If you're using AI tools or documentation, make sure they're referencing v4 — most still default to v3 syntax.
+> ⚠️ **Aviso sobre Tailwind v4:** este proyecto usa **Tailwind CSS v4**, que tiene diferencias importantes frente a v3. Si usas herramientas de IA o documentación, asegúrate de que estén referenciando v4 — la mayoría todavía asume por defecto la sintaxis de v3.
 
-> ⚠️ **Google Maps requires a Map ID.** The map uses `AdvancedMarkerElement`, which only works when a `mapId` is set. Because a `mapId` is present, Google **ignores** any `styles` option passed from the code — map styling (including hiding default POIs) must be configured in Google Cloud Console for that Map ID.
+> ⚠️ **Google Maps necesita un Map ID.** El mapa usa `AdvancedMarkerElement`, que solo funciona con un `mapId` configurado. Como hay un `mapId` presente, Google **ignora** cualquier opción `styles` que se pase desde el código — el estilo del mapa (incluyendo ocultar los POI por defecto) debe configurarse en Google Cloud Console para ese Map ID.
 
 ---
 
-## Getting Started 🚀
+## Cómo empezar 🚀
 
-### Prerequisites
+### Requisitos previos
 
-- [Node.js 24 LTS](https://nodejs.org/) installed (developed on v24.14.0)
-- Supabase project credentials
-- A Google Maps API key with a Map ID
+- [Node.js 24 LTS](https://nodejs.org/) instalado (desarrollado con v24.14.0)
+- Credenciales del proyecto de Supabase
+- Una API key de Google Maps con Map ID
 
-### 1. Navigate to the frontend folder
+### 1. Entrar a la carpeta del frontend
 
 ```bash
 cd client
 ```
 
-### 2. Install dependencies
+### 2. Instalar dependencias
 
 ```bash
 npm install
 ```
 
-### 3. Set up environment variables
+### 3. Configurar las variables de entorno
 
-Create a `.env` file inside **`client/`** (not in `server/`):
+Crear un archivo `.env` dentro de **`client/`** (no en `server/`):
 
 ```
-VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_anon_key
-VITE_GOOGLE_API_KEY=your_google_maps_key
+VITE_SUPABASE_URL=tu_url_de_supabase
+VITE_SUPABASE_ANON_KEY=tu_anon_key
+VITE_GOOGLE_API_KEY=tu_clave_de_google_maps
 ```
 
-> All three are required. If `VITE_GOOGLE_API_KEY` is missing the app still loads, but the map renders blank with no visible error.
+> Las tres son obligatorias. Si falta `VITE_GOOGLE_API_KEY` la app igual carga, pero el mapa se queda en blanco sin ningún error visible.
 
-> The actual values are shared privately. Do **not** commit this file — it is already in `.gitignore`.
+> Los valores reales se comparten en privado. **No** subir este archivo — ya está en `.gitignore`.
 
-### 4. Start the development server
+### 4. Iniciar el servidor de desarrollo
 
 ```bash
 npm run dev
 ```
 
-The app will be available at `http://localhost:5173` by default.
+La app queda disponible por defecto en `http://localhost:5173`.
 
 ---
 
@@ -142,137 +142,137 @@ npx cap open android
 
 ---
 
-## How is the project organized? 🗂️
+## ¿Cómo está organizado el proyecto? 🗂️
 
 ```
 client/
-├── android/                 # Capacitor Android project (generated, but tracked)
-├── public/                  # Static assets (favicon, campus photos, etc.)
-├── tests/                   # Playwright smoke tests (login, logout)
+├── android/                 # Proyecto Android de Capacitor (generado, pero versionado)
+├── public/                  # Recursos estáticos (favicon, fotos del campus, etc.)
+├── tests/                   # Smoke tests de Playwright (login, logout)
 ├── src/
-│   ├── assets/              # Fonts, icons, and other bundled resources
+│   ├── assets/              # Fuentes, íconos y otros recursos empaquetados
 │   ├── components/
-│   │   ├── atoms/           # Smallest reusable UI pieces (buttons, pins, tag picker)
-│   │   └── organisms/       # Larger composed components (headers, forms, modals, menu)
-│   ├── context/             # React context providers — currently menu open/close state
-│   ├── data/                # Local JSON used by the search (see note below)
-│   ├── pages/               # One file per route/view (Login, Mapa, Foro, etc.)
-│   ├── routes/              # Route definitions and protected route logic
-│   ├── services/            # All external integrations (see below)
-│   ├── App.jsx              # Root component with router setup
-│   ├── index.css            # Global styles and Tailwind v4 entry point
-│   └── main.jsx             # App entry point
-├── .env                     # Local env variables (not committed)
+│   │   ├── atoms/           # Piezas de UI reutilizables más pequeñas (botones, pines, selector de etiquetas)
+│   │   └── organisms/       # Componentes compuestos más grandes (encabezados, formularios, modales, menú)
+│   ├── context/             # Proveedores de contexto de React — hoy solo el estado de apertura del menú
+│   ├── data/                # JSON local usado por la búsqueda (ver nota abajo)
+│   ├── pages/               # Un archivo por ruta/vista (Login, Mapa, Foro, etc.)
+│   ├── routes/               # Definición de rutas y lógica de rutas protegidas
+│   ├── services/             # Todas las integraciones externas (ver abajo)
+│   ├── App.jsx               # Componente raíz con la configuración del router
+│   ├── index.css             # Estilos globales y punto de entrada de Tailwind v4
+│   └── main.jsx               # Punto de entrada de la app
+├── .env                     # Variables de entorno locales (no se sube)
 └── vite.config.js
 ```
 
-### Two headers, on purpose 🧩
+### Dos headers, a propósito 🧩
 
-There are two header components and each page picks one in its `import`:
+Hay dos componentes de encabezado y cada página elige uno en su `import`:
 
-- **`IniHeader.jsx`** — reduced header (logo + accessibility only). Used by the four pre-session pages: `Landing`, `Login`, `Register`, `LogOut`.
-- **`Header2.jsx`** — full header (logo + accessibility + Perfil + Menú). Used by the nine pages that require an active session.
+- **`IniHeader.jsx`** — encabezado reducido (solo logo + accesibilidad). Lo usan las cuatro pantallas sin sesión: `Landing`, `Login`, `Register`, `LogOut`.
+- **`Header2.jsx`** — encabezado completo (logo + accesibilidad + Perfil + Menú). Lo usan las nueve pantallas que requieren sesión activa.
 
-There is no runtime condition — the choice is fixed per page at import time.
+No hay ninguna condición en tiempo de ejecución — la elección queda fija por página desde el `import`.
 
-### What lives in `/services`? ⚙️
+### ¿Qué hay en `/services`? ⚙️
 
-Everything that talks to the outside world. No page or component queries Supabase directly; they all go through a service.
+Todo lo que habla con el mundo exterior. Ninguna page o componente consulta Supabase directamente; todos pasan por un servicio.
 
-| Service | Responsibility |
+| Servicio | Responsabilidad |
 |---|---|
-| `supabase.js` | Creates the single Supabase client used by every other service |
-| `auth.service.js` | Login, registration, logout, session |
-| `profile.service.js` | Current user's profile |
-| `faqs.service.js` | FAQ entries |
-| `foro.service.js` | Posts, replies, nested replies, likes |
-| `mentores.service.js` | Mentor directory, Teams deep link, contact tracking |
-| `profesores.service.js` | Professor directory |
-| `eventos.service.js` | Activities, sign-up and cancellation |
-| `ubicaciones.service.js` | Campus locations for the map |
-| `mapa.service.js` | Map maths — distances, nearby blocks, pin legend *(no Supabase)* |
-| `location.service.js` | Device GPS + runtime permission *(no Supabase)* |
-| `map.service.js` | Loads the Google Maps SDK *(no Supabase)* |
+| `supabase.js` | Crea el único cliente de Supabase que usan todos los demás servicios |
+| `auth.service.js` | Login, registro, logout, sesión |
+| `profile.service.js` | Perfil del usuario actual |
+| `faqs.service.js` | Preguntas del FAQ |
+| `foro.service.js` | Publicaciones, respuestas, respuestas anidadas, likes |
+| `mentores.service.js` | Directorio de mentores, deep link de Teams, registro de contactos |
+| `profesores.service.js` | Directorio de profesores |
+| `eventos.service.js` | Actividades, inscripción y cancelación |
+| `ubicaciones.service.js` | Ubicaciones del campus para el mapa |
+| `mapa.service.js` | Cálculos del mapa — distancias, bloques cercanos, leyenda de pines *(sin Supabase)* |
+| `location.service.js` | GPS del dispositivo y permiso en tiempo de ejecución *(sin Supabase)* |
+| `map.service.js` | Carga el SDK de Google Maps *(sin Supabase)* |
 
-The last three live in `/services` but do not touch the database — the folder ended up meaning "everything that isn't UI".
+Los últimos tres viven en `/services` pero no tocan la base de datos — la carpeta terminó significando "todo lo que no es interfaz".
 
-### About `/data` 📦
+### Sobre `/data` 📦
 
-- **`searchIndex.json`** — still in use. Indexes the app's sections so `/buscar` can find them. It searches *app sections*, not campus places.
-- **`tagList.json`** — the 22 tags offered by the search filter.
-- **`markersList.js`** — **legacy, no longer imported.** The 35 campus locations were migrated to the `ubicaciones` table in Supabase; the map now reads from the database. The file is kept only for reference and can be deleted.
+- **`searchIndex.json`** — sigue en uso. Indexa las secciones de la app para que `/buscar` las encuentre. Busca *secciones de la app*, no lugares del campus.
+- **`tagList.json`** — las 22 etiquetas que ofrece el filtro de búsqueda.
+- **`markersList.js`** — **legado, ya no se importa.** Las 35 ubicaciones del campus se migraron a la tabla `ubicaciones` de Supabase; el mapa ahora lee de la base de datos. El archivo se conserva solo como referencia y puede borrarse.
 
 ---
 
-## Database 🗄️
+## Base de datos 🗄️
 
-**PostgreSQL via Supabase.** Every table has Row Level Security enabled.
+**PostgreSQL vía Supabase.** Todas las tablas tienen Row Level Security activado.
 
-| Table | Purpose |
+| Tabla | Propósito |
 |---|---|
-| `profiles` | User data, created automatically by a trigger on `auth.users` |
-| `ubicaciones` | Campus locations shown on the map |
-| `faqs` | Frequently asked questions |
-| `post` / `respuesta_post` / `likes_post` | Forum content, replies and reactions |
-| `mentores` / `contactos_mentor` | Mentor directory and contact tracking |
-| `eventos` / `inscripciones_evento` | Activities and sign-ups |
-| `profesores` | Professor directory |
+| `profiles` | Datos del usuario, creada automáticamente por un trigger sobre `auth.users` |
+| `ubicaciones` | Ubicaciones del campus que se muestran en el mapa |
+| `faqs` | Preguntas frecuentes |
+| `post` / `respuesta_post` / `likes_post` | Contenido del foro, respuestas y reacciones |
+| `mentores` / `contactos_mentor` | Directorio de mentores y registro de contactos |
+| `eventos` / `inscripciones_evento` | Actividades e inscripciones |
+| `profesores` | Directorio de profesores |
 
-> **Profile creation:** a database trigger (`on_auth_user_created`) creates the `profiles` row whenever a user is added to `auth.users`, no matter how. `register()` then completes it with the form data using `upsert`. Before this trigger existed, an account created outside the form ended up with no profile and broke every foreign key pointing at it.
+> **Creación del perfil:** un trigger de la base de datos (`on_auth_user_created`) crea la fila en `profiles` cada vez que se agrega un usuario a `auth.users`, sin importar cómo. Luego `register()` la completa con los datos del formulario usando `upsert`. Antes de que existiera este trigger, una cuenta creada fuera del formulario quedaba sin perfil y rompía todas las llaves foráneas que apuntaban a ella.
 
-Local data (not in the DB):
-- Search index and tag list
-
----
-
-## Notes 📝
-
-- All Supabase keys must use the `VITE_` prefix to be accessible in the browser via `import.meta.env`.
-- Auth sessions are managed automatically by the Supabase client library — the JWT is issued and signed by Supabase, stored in `localStorage`, and attached to every request by the SDK. No token handling exists in this codebase.
-- Email confirmation is **disabled** in the Supabase project, so `signUp()` returns an active session immediately. Registration explicitly calls `logout()` before redirecting to the login screen.
+Datos locales (no están en la BD):
+- Índice de búsqueda y lista de etiquetas
 
 ---
 
-## Sprint 1 — code traceability 🧭
+## Notas 📝
 
-> Sprint scope only (Auth, access & home). For the full acceptance criteria of each story, see the **"Sprint 1"** section in the repo root `README.md` — nothing below duplicates it.
+- Todas las claves de Supabase deben llevar el prefijo `VITE_` para ser accesibles en el navegador vía `import.meta.env`.
+- Las sesiones de autenticación las gestiona automáticamente la librería cliente de Supabase — el JWT lo emite y firma Supabase, se guarda en `localStorage` y el SDK lo adjunta a cada petición. No existe manejo propio de tokens en este código.
+- La confirmación por correo está **desactivada** en el proyecto de Supabase, así que `signUp()` devuelve una sesión activa de inmediato. El registro llama explícitamente a `logout()` antes de redirigir a la pantalla de login.
 
-| HU | Route(s) | Pages / components | Service / data |
+---
+
+## Sprint 1 — trazabilidad de código 🧭
+
+> Alcance solo del sprint (Autenticación, acceso e inicio). Para los criterios de aceptación completos de cada historia, ver la sección **"Sprint 1"** en el `README.md` de la raíz del repo — nada de lo de abajo lo duplica.
+
+| HU | Ruta(s) | Pages / componentes | Servicio / dato |
 |---|---|---|---|
-| HU-31 Welcome | `/` | `pages/Landing.jsx`, `IniHeader`, `atoms/Card`, `Button` | — |
-| HU-32 Global header | all | `organisms/Header2.jsx` (full) / `organisms/IniHeader.jsx` (reduced), `atoms/AccessButton` | — |
-| HU-33 Footer | all | `organisms/Footer.jsx` | — |
-| HU-34 Side menu | global | `organisms/Menu.jsx`, `context/MenuContext`, `App.jsx` | `auth.service.js` (`logout`) |
-| HU-18 Sign up | `/register` | `pages/Register.jsx`, `organisms/RegisterForm.jsx` | `auth.service.js` (`register`), `data/careerList.json` (26 programs dropdown) |
+| HU-31 Bienvenida | `/` | `pages/Landing.jsx`, `IniHeader`, `atoms/Card`, `Button` | — |
+| HU-32 Encabezado global | todas | `organisms/Header2.jsx` (completo) / `organisms/IniHeader.jsx` (reducido), `atoms/AccessButton` | — |
+| HU-33 Pie de página | todas | `organisms/Footer.jsx` | — |
+| HU-34 Menú lateral | global | `organisms/Menu.jsx`, `context/MenuContext`, `App.jsx` | `auth.service.js` (`logout`) |
+| HU-18 Crear cuenta | `/register` | `pages/Register.jsx`, `organisms/RegisterForm.jsx` | `auth.service.js` (`register`), `data/careerList.json` (desplegable de 26 programas) |
 | HU-01 Login | `/Login` | `pages/Login.jsx`, `organisms/LoginForm.jsx` | `auth.service.js` (`login`) |
 | HU-02 Logout | `/LogOut`, `/perfil` | `pages/LogOut.jsx`, `pages/Perfil.jsx`, `Menu`, `routes/ProtectedRoute.jsx` | `auth.service.js` (`logout`, `getSession`) |
-| HU-19 Home + news | `/dashboard` | `pages/Dashboard.jsx`, `organisms/Carousel.jsx`, `atoms/NewsCard.jsx` | — |
-| HU-20 Quick access | `/dashboard`, `/buscar` | `organisms/QuickAccess.jsx`, `atoms/DashButton.jsx`, `pages/Buscar.jsx`, `organisms/Search.jsx` | — |
+| HU-19 Inicio + novedades | `/dashboard` | `pages/Dashboard.jsx`, `organisms/Carousel.jsx`, `atoms/NewsCard.jsx` | — |
+| HU-20 Accesos rápidos | `/dashboard`, `/buscar` | `organisms/QuickAccess.jsx`, `atoms/DashButton.jsx`, `pages/Buscar.jsx`, `organisms/Search.jsx` | — |
 
-### Sprint 1 test coverage 🧪
+### Cobertura de pruebas del Sprint 1 🧪
 
-The existing smoke tests (`npm test`, with `TEST_EMAIL` / `TEST_PASSWORD` in `client/.env`) cover HU-01 and HU-02: valid login → dashboard, invalid login → error, protected route without session → landing, menu logout → `/LogOut`, dashboard after logout → landing.
+Los smoke tests existentes (`npm test`, con `TEST_EMAIL` / `TEST_PASSWORD` en `client/.env`) cubren HU-01 y HU-02: login válido → dashboard, login inválido → error, ruta protegida sin sesión → landing, logout desde el menú → `/LogOut`, dashboard después de logout → landing.
 
-### Known Sprint 1 gaps ⚠️
+### Brechas conocidas del Sprint 1 ⚠️
 
-1. **HU-01:** no first-party bcrypt/JWT/captcha code — password hashing and the session JWT are handled by Supabase Auth (see Notes above); the login form has no captcha.
+1. **HU-01:** sin código propio de bcrypt/JWT/captcha — el cifrado de contraseñas y el JWT de sesión los maneja Supabase Auth (ver Notas arriba); el formulario de login no tiene captcha.
 
-> **HU-20 — search box removed (2026-09-16):** the quick-access block no longer has its own search box. It only found app sections that already have a quick-access tile, so it was redundant; search is reached through the "Buscar" tile (`/buscar`).
+> **HU-20 — buscador retirado (16/09/2026):** el bloque de accesos rápidos ya no tiene su propio buscador. Solo encontraba secciones de la app que ya tienen su propio acceso rápido, así que era redundante; la búsqueda se hace desde el acceso "Buscar" (`/buscar`).
 
 ---
 
-## Sprint 2 — code traceability 🧭
+## Sprint 2 — trazabilidad de código 🧭
 
-> Sprint scope only (Community & Support: FAQ and mentors). For the full acceptance criteria of each story, see the **"Sprint 2"** section in the repo root `README.md` — nothing below duplicates it.
+> Alcance solo del sprint (Comunidad y Soporte: FAQ y mentores). Para los criterios de aceptación completos de cada historia, ver la sección **"Sprint 2"** en el `README.md` de la raíz del repo — nada de lo de abajo lo duplica.
 
-| HU | Route(s) | Pages / components | Service / data |
+| HU | Ruta(s) | Pages / componentes | Servicio / dato |
 |---|---|---|---|
-| HU-04 FAQ | `/faqs` | `pages/FaqsPage.jsx` | `faqs.service.js` (`getFaqs`, `agruparPorCategoria`), table `faqs` |
-| HU-05 FAQ → forum | `/faqs`, `/foro` | `pages/FaqsPage.jsx` (button "¿Aún con dudas?"), `pages/Foro.jsx` (reads `location.state`) | `faqs.service.js` |
-| HU-06 Mentor directory | `/mentores` | `pages/Mentores.jsx` (filter, empty-state, cards) | `mentores.service.js` (`getMentores`, `getMaterias`), table `mentores` |
-| HU-07 Teams contact | `/mentores` | `pages/Mentores.jsx` (modal "Contactar") | `mentores.service.js` (`construirEnlaceTeams`, `registrarContacto`), table `contactos_mentor` |
+| HU-04 FAQ | `/faqs` | `pages/FaqsPage.jsx` | `faqs.service.js` (`getFaqs`, `agruparPorCategoria`), tabla `faqs` |
+| HU-05 FAQ → foro | `/faqs`, `/foro` | `pages/FaqsPage.jsx` (botón "¿Aún con dudas?"), `pages/Foro.jsx` (lee `location.state`) | `faqs.service.js` |
+| HU-06 Directorio de mentores | `/mentores` | `pages/Mentores.jsx` (filtro, estado vacío, tarjetas) | `mentores.service.js` (`getMentores`, `getMaterias`), tabla `mentores` |
+| HU-07 Contacto por Teams | `/mentores` | `pages/Mentores.jsx` (modal "Contactar") | `mentores.service.js` (`construirEnlaceTeams`, `registrarContacto`), tabla `contactos_mentor` |
 
-### Known Sprint 2 gaps ⚠️
+### Brechas conocidas del Sprint 2 ⚠️
 
-1. **HU-06:** the 10 rows in the `mentores` table are **seed/test data** entered by hand to exercise the flow — not the university's real tutor directory. The emails follow the real UPB institutional format (`nombre.apellido@upb.edu.co`) but don't belong to real people.
-2. **HU-07:** "works on desktop browser and mobile app" is unverified inside the Android APK. The contact button uses `window.open(..., "_blank")`; this is confirmed to work in a regular browser, but its behavior inside Capacitor's WebView (no external-link plugin installed) has not been tested on a device.
+1. **HU-06:** las 10 filas de la tabla `mentores` son **datos de prueba** insertados a mano para probar el flujo, no el directorio real de tutores de la universidad. Los correos siguen el formato institucional real de la UPB (`nombre.apellido@upb.edu.co`) pero no pertenecen a personas reales.
+2. **HU-07:** "funciona en navegador de escritorio y en la app móvil" no se ha verificado dentro del APK de Android. El botón de contacto usa `window.open(..., "_blank")`; está confirmado que funciona en un navegador normal, pero su comportamiento dentro del WebView de Capacitor (sin plugin de enlaces externos instalado) no se ha probado en un dispositivo.
