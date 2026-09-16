@@ -257,4 +257,4 @@ The existing smoke tests (`npm test`, with `TEST_EMAIL` / `TEST_PASSWORD` in `cl
 
 1. **HU-01:** no first-party bcrypt/JWT/captcha code — password hashing and the session JWT are handled by Supabase Auth (see Notes above); the login form has no captcha.
 
-> **Resolved — HU-20:** the search box inside the quick-access block used to do nothing (it expected an `onSearch` prop that `AppRouter.jsx` never passed). It now navigates to `/buscar?q=<term>`, and `Buscar.jsx` reads `q` to show the results.
+> **HU-20 — search box removed (2026-09-16):** the quick-access block no longer has its own search box. It only found app sections that already have a quick-access tile, so it was redundant; search is reached through the "Buscar" tile (`/buscar`).

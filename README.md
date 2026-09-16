@@ -167,7 +167,7 @@ Como usuario de AGE, quiero accesos rápidos a los módulos desde el inicio, par
 
 - ✔ Accesos directos a Mapa, Actividades, Buscar, Foro, Preguntas y Mentor
 - ✔ Cada acceso lleva a su sección correspondiente
-- ✔ Buscador disponible dentro del bloque de accesos rápidos: al buscar, lleva a `/buscar` con el término ya escrito y sus resultados
+- ✔ La búsqueda se ofrece como un acceso rápido más ("Buscar" → `/buscar`). El buscador que había dentro del bloque se retiró el 16 de septiembre de 2026 por redundante: solo encontraba secciones que ya tienen su propio acceso rápido
 
 ### Brechas conocidas del Sprint 1
 

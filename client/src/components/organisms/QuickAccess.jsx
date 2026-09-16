@@ -1,4 +1,3 @@
-import { useState } from "react";
 import QuickAccessItem from "../atoms/DashButton"
 import { useNavigate } from "react-router-dom";
 
@@ -82,39 +81,12 @@ const QUICK_ITEMS = [
 ];
 
 export default function QuickAccessGrid() {
-  const [query, setQuery] = useState("");
   const navigate = useNavigate();
-
-  // Lleva el término a /buscar, que lo toma de la URL y muestra los resultados.
-  const handleSearch = () => {
-    const termino = query.trim();
-    if (termino) navigate(`/buscar?q=${encodeURIComponent(termino)}`);
-  };
 
   return (
     <section className="px-5 pt-4 pb-6">
-      {/* Encabezado + buscador */}
-      <div className="flex items-center justify-between gap-3 flex-wrap mb-1">
-        <h2 className="text-lg font-bold text-negro-txt">Accesos Rápidos</h2>
-        <div className="flex items-center border-2 border-gray-200 rounded-lg overflow-hidden bg-white">
-          <input
-            type="text"
-            placeholder="Escribe algo para buscar...."
-            className="outline-none px-3 py-1.5 text-sm text-gray-600 w-44"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-            aria-label="Buscar en el asistente"
-          />
-          <button
-            onClick={handleSearch}
-            aria-label="Ejecutar búsqueda"
-            className="bg-gray-800 text-white px-3 py-2 text-sm hover:bg-gray-700 transition-colors"
-          >
-            →
-          </button>
-        </div>
-      </div>
+      {/* Encabezado. La búsqueda vive en el acceso "Buscar" (/buscar). */}
+      <h2 className="text-lg font-bold text-negro-txt mb-1">Accesos Rápidos</h2>
 
       <p className="text-xs text-negro-txt mb-4">
         Aqui puedes encontrar accesos rapidos al aplicativo
