@@ -14,12 +14,12 @@ import Mentores from "../pages/Mentores"
 import Foro from "../pages/Foro";
 import LogOut from "../pages/LogOut";
 
-export default function AppRouter({ onNavigate }) {
+export default function AppRouter() {
   return (
     <Routes>
        <Route path="/" element={<Landing />} />
       <Route path="/Login" element={<Login />} />
-       <Route path="/dashboard" element={<ProtectedRoute><Dashboard onNavigate={onNavigate} /></ProtectedRoute>} />
+       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       <Route path="/profesores" element={<ProtectedRoute><ProfesoresPage /></ProtectedRoute>} />
       <Route path="/faqs" element={<ProtectedRoute><FaqsPage /></ProtectedRoute>} />
       <Route path="/mapa" element={<ProtectedRoute><Mapa /></ProtectedRoute>} />

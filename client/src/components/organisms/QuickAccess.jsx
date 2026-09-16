@@ -81,12 +81,14 @@ const QUICK_ITEMS = [
   },
 ];
 
-export default function QuickAccessGrid({ onNavigate, onSearch }) {
+export default function QuickAccessGrid() {
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
 
+  // Lleva el término a /buscar, que lo toma de la URL y muestra los resultados.
   const handleSearch = () => {
-    if (onSearch && query.trim()) onSearch(query.trim());
+    const termino = query.trim();
+    if (termino) navigate(`/buscar?q=${encodeURIComponent(termino)}`);
   };
 
   return (

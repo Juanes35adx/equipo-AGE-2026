@@ -256,4 +256,5 @@ The existing smoke tests (`npm test`, with `TEST_EMAIL` / `TEST_PASSWORD` in `cl
 ### Known Sprint 1 gaps ⚠️
 
 1. **HU-01:** no first-party bcrypt/JWT/captcha code — password hashing and the session JWT are handled by Supabase Auth (see Notes above); the login form has no captcha.
-2. **HU-20:** the search box inside the quick-access block does not navigate with the entered term (`AppRouter.jsx` passes no `onSearch` to `Dashboard`); full search works from `/buscar`.
+
+> **Resolved — HU-20:** the search box inside the quick-access block used to do nothing (it expected an `onSearch` prop that `AppRouter.jsx` never passed). It now navigates to `/buscar?q=<term>`, and `Buscar.jsx` reads `q` to show the results.

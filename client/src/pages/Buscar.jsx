@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import searchData from '../data/searchIndex.json';
 import Header from '../components/organisms/Header2'
 import Footer from '../components/organisms/Footer'
@@ -10,7 +10,9 @@ import SearchBar from '../components/organisms/Search';
     * The query will be compared with the contents of the description and tags in order to find a fitting result
     */
 const Buscar = () => {
-  const [query, setQuery] = useState('');
+  // Si se llega desde el buscador del dashboard, el término viene en ?q=
+  const [searchParams] = useSearchParams();
+  const [query, setQuery] = useState(searchParams.get('q') ?? '');
   const navigate = useNavigate();
   
   /** filteredResults

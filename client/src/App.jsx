@@ -19,7 +19,7 @@ const AppContent = () => {
          onClose={closeMenu} 
          onNavigate={handleNavigate} 
        />
-       <AppRouter onNavigate={handleNavigate} />
+       <AppRouter />
     </>
   );
 };

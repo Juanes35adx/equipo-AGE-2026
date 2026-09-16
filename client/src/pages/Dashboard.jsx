@@ -1,13 +1,10 @@
-import React, { useState } from 'react';
-import { useNavigate } from "react-router-dom";
-import { logout } from "../services/auth.service";
 import Header from "../components/organisms/Header2"
 import Footer from "../components/organisms/Footer"
 import NewsCarousel from "../components/organisms/Carousel"
 import QuickAccessGrid from "../components/organisms/QuickAccess"
 import NewsCard from "../components/atoms/NewsCard"
 
-export default function Dashboard({ onNavigate, onSearch }) {
+export default function Dashboard() {
   return (
     <div >
       <Header />
@@ -26,7 +23,7 @@ export default function Dashboard({ onNavigate, onSearch }) {
 
         
         <NewsCarousel />
-        <QuickAccessGrid onNavigate={onNavigate} onSearch={onSearch} />
+        <QuickAccessGrid />
       </main>
       <Footer />
     </div>

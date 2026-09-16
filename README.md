@@ -86,7 +86,7 @@ Primer sprint del proyecto. Cubre que un visitante conozca AGE, cree su cuenta, 
 | HU-01 | Inicio de sesión | Autenticación y Acceso | ⚠ Cumplida con notas (ver detalle) |
 | HU-02 | Cierre de sesión seguro | Autenticación y Acceso | ✔ Cumplida |
 | HU-19 | Pantalla de inicio con novedades | Inicio | ✔ Cumplida |
-| HU-20 | Accesos rápidos desde el inicio | Inicio | ⚠ Cumplida con notas (ver detalle) |
+| HU-20 | Accesos rápidos desde el inicio | Inicio | ✔ Cumplida |
 
 ✔ = verificado contra el código · ⚠ = funciona, con una diferencia honesta frente al criterio original (explicada abajo)
 
@@ -167,14 +167,11 @@ Como usuario de AGE, quiero accesos rápidos a los módulos desde el inicio, par
 
 - ✔ Accesos directos a Mapa, Actividades, Buscar, Foro, Preguntas y Mentor
 - ✔ Cada acceso lleva a su sección correspondiente
-- ✔ Buscador disponible dentro del bloque de accesos rápidos y sección de búsqueda funcional en `/buscar`
-- ⚠ **Nota honesta:** el buscador dentro del bloque de accesos rápidos hoy no navega con el término ingresado; la búsqueda completa sí funciona desde la sección `/buscar`.
+- ✔ Buscador disponible dentro del bloque de accesos rápidos: al buscar, lleva a `/buscar` con el término ya escrito y sus resultados
 
 ### Brechas conocidas del Sprint 1
 
 1. HU-01: sin captcha propio; la seguridad (bcrypt/JWT) la provee Supabase Auth, no código del repo.
-2. HU-20: el campo de búsqueda del bloque de accesos rápidos no lleva a `/buscar` con el término; usar la sección Buscar.
-
 ### Cómo verificar el Sprint 1 a mano
 
 1. `cd client; npm run dev` y abrir `http://localhost:5173`.
