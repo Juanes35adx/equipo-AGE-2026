@@ -258,3 +258,21 @@ The existing smoke tests (`npm test`, with `TEST_EMAIL` / `TEST_PASSWORD` in `cl
 1. **HU-01:** no first-party bcrypt/JWT/captcha code — password hashing and the session JWT are handled by Supabase Auth (see Notes above); the login form has no captcha.
 
 > **HU-20 — search box removed (2026-09-16):** the quick-access block no longer has its own search box. It only found app sections that already have a quick-access tile, so it was redundant; search is reached through the "Buscar" tile (`/buscar`).
+
+---
+
+## Sprint 2 — code traceability 🧭
+
+> Sprint scope only (Community & Support: FAQ and mentors). For the full acceptance criteria of each story, see the **"Sprint 2"** section in the repo root `README.md` — nothing below duplicates it.
+
+| HU | Route(s) | Pages / components | Service / data |
+|---|---|---|---|
+| HU-04 FAQ | `/faqs` | `pages/FaqsPage.jsx` | `faqs.service.js` (`getFaqs`, `agruparPorCategoria`), table `faqs` |
+| HU-05 FAQ → forum | `/faqs`, `/foro` | `pages/FaqsPage.jsx` (button "¿Aún con dudas?"), `pages/Foro.jsx` (reads `location.state`) | `faqs.service.js` |
+| HU-06 Mentor directory | `/mentores` | `pages/Mentores.jsx` (filter, empty-state, cards) | `mentores.service.js` (`getMentores`, `getMaterias`), table `mentores` |
+| HU-07 Teams contact | `/mentores` | `pages/Mentores.jsx` (modal "Contactar") | `mentores.service.js` (`construirEnlaceTeams`, `registrarContacto`), table `contactos_mentor` |
+
+### Known Sprint 2 gaps ⚠️
+
+1. **HU-06:** the 10 rows in the `mentores` table are **seed/test data** entered by hand to exercise the flow — not the university's real tutor directory. The emails follow the real UPB institutional format (`nombre.apellido@upb.edu.co`) but don't belong to real people.
+2. **HU-07:** "works on desktop browser and mobile app" is unverified inside the Android APK. The contact button uses `window.open(..., "_blank")`; this is confirmed to work in a regular browser, but its behavior inside Capacitor's WebView (no external-link plugin installed) has not been tested on a device.

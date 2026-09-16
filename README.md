@@ -179,3 +179,71 @@ Como usuario de AGE, quiero accesos rápidos a los módulos desde el inicio, par
 3. Registro: crear cuenta eligiendo programa en el desplegable → redirige al login.
 4. Login inválido muestra error; login válido entra al dashboard (saludo + novedades + accesos).
 5. Menú lateral: overlay, 8 secciones, "Cerrar Sesión" → confirmación y rutas protegidas bloqueadas.
+
+---
+
+## Sprint 2 — Comunidad y Soporte
+
+Segundo sprint del proyecto. Cubre las preguntas frecuentes, el puente entre el FAQ y el foro, y el directorio de mentores con contacto por Microsoft Teams. Todo lo de esta sección describe **únicamente el Sprint 2**; el resto del documento no cambia.
+
+**Épica:** Comunidad y Soporte
+
+### Historias de usuario del sprint
+
+| HU | Historia | Épica | Estado |
+|---|---|---|---|
+| HU-04 | Preguntas frecuentes (FAQ) | Comunidad y Soporte | ✔ Cumplida |
+| HU-05 | Escalamiento del FAQ al foro | Comunidad y Soporte | ✔ Cumplida |
+| HU-06 | Directorio de mentores con filtro por materia | Comunidad y Soporte | ✔ Cumplida |
+| HU-07 | Contacto con el mentor vía Teams | Comunidad y Soporte | ⚠ Cumplida con notas (ver detalle) |
+
+✔ = verificado contra el código y la base de datos · ⚠ = funciona, con una diferencia honesta frente al criterio original (explicada abajo)
+
+### Detalle por historia
+
+#### HU-04 · Preguntas frecuentes (FAQ)
+Como usuario de AGE, quiero consultar una sección de preguntas frecuentes, para poder resolver dudas comunes sin tener que contactar a alguien o investigar por mi cuenta. Requisito origen: F-13. Puntos de historia: 1. Prioridad: P(1).
+
+- ✔ Listado de preguntas frecuentes agrupadas por categoría
+- ✔ La respuesta se muestra siempre visible bajo cada pregunta (sin acordeón, igual que el diseño)
+- ✔ Cada respuesta incluye enlace a la fuente oficial de la UPB — las 10 preguntas de la base de datos tienen `link_oficial`
+- ✔ Orden de las preguntas configurable desde la base de datos (columna `orden`)
+- ✔ Contenido cargado dinámicamente desde la tabla `faqs`, sin estar quemado en el código
+
+#### HU-05 · Escalamiento del FAQ al foro
+Como usuario de AGE, necesito un botón "¿Aún con dudas?" en cada respuesta del FAQ, para poder llevar mi pregunta al foro cuando la respuesta breve no me resolvió. Requisito origen: F-13. Puntos de historia: 1. Prioridad: P(1).
+
+- ✔ Botón "¿Aún con dudas?" visible en cada respuesta desplegada
+- ✔ El botón aparece en cada tarjeta del FAQ (no hay acordeón: la respuesta ya está siempre visible)
+- ✔ Al presionarlo redirige al usuario a la sección de foro
+- ✔ Precarga el contexto de la pregunta al crear la publicación (título y respuesta de la FAQ)
+
+#### HU-06 · Directorio de mentores con filtro por materia
+Como usuario de AGE, quiero filtrar los mentores disponibles por materia, para poder identificar rápidamente quién puede ayudarme con la asignatura en la que tengo dificultades. Requisito origen: F-10. Puntos de historia: 2. Prioridad: P(1).
+
+- ✔ Sección "Mentores" accesible desde el menú lateral
+- ✔ Listado de mentores cargado desde la tabla `mentores`, no quemado en el código
+- ✔ Filtro por materia aplicable sobre el listado
+- ✔ Cada mentor muestra nombre, tipo de tutor y materia
+- ✔ Si el filtro no arroja coincidencias, muestra mensaje claro y un botón "Ver todos los mentores"
+- ✔ Solo se muestran los mentores marcados como `activo = true`
+- ⚠ **Nota honesta:** los 10 mentores de la base de datos son **datos de prueba** (insertados a mano para poder probar el flujo), no el directorio real de tutores de la UPB. Los correos siguen el formato institucional (`nombre.apellido@upb.edu.co`), pero no corresponden a personas reales — escribirles por Teams no llega a nadie.
+
+#### HU-07 · Contacto con el mentor vía Teams
+Como usuario de AGE, quiero abrir un chat privado en Teams con el mentor que seleccioné, para poder resolver mis dudas por el canal institucional sin tener que buscarlo manualmente. Requisito origen: F-10 / F-12. Puntos de historia: 1. Prioridad: P(1).
+
+- ✔ Botón de contacto visible en la ficha de cada mentor (modal "Contactar")
+- ✔ Al pulsarlo abre un chat privado en Teams mediante deep link (`teams.microsoft.com/l/chat/0/0?users=...`)
+- ✔ El enlace se construye con el `email_institucional` del mentor
+- ✔ Ofrece alternativa por correo ("¿No tienes Teams? Escribir por correo") si Teams no está disponible
+- ✔ Se registra el evento "contacto iniciado" en la tabla `contactos_mentor` para poder medir el uso
+- ⚠ **Nota honesta:** el criterio "funciona en navegador de escritorio y en la app móvil" no se ha probado dentro del APK de Android. El botón usa `window.open(..., "_blank")`; en el navegador abre Teams sin problema, pero dentro del WebView de Capacitor ese comportamiento no está verificado y no hay un plugin de apertura de enlaces externos instalado.
+
+### Cómo verificar el Sprint 2 a mano
+
+1. `cd client; npm run dev`, iniciar sesión y entrar a "Preguntas" desde el menú o los accesos rápidos.
+2. FAQ: las preguntas aparecen agrupadas por categoría, con la respuesta siempre visible y un enlace "Ver en página oficial".
+3. En cualquier pregunta, presionar "¿Aún con dudas?" → abre el foro con el título y la respuesta precargados.
+4. Entrar a "Mentores" desde el menú. Filtrar por una materia del desplegable y comprobar que la lista se reduce.
+5. Elegir una materia sin mentores (o vaciar el filtro y luego uno inexistente vía consola) para ver el mensaje "no hay mentores" con el botón "Ver todos los mentores".
+6. Abrir la ficha de un mentor ("Contactar") y probar los botones "Abrir chat en Teams" y "Escribir por correo".
