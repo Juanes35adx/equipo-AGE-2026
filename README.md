@@ -196,6 +196,8 @@ Segundo sprint del proyecto. Cubre las preguntas frecuentes, el puente entre el 
 | HU-05 | Escalamiento del FAQ al foro | Comunidad y Soporte | ✔ Cumplida |
 | HU-06 | Directorio de mentores con filtro por materia | Comunidad y Soporte | ✔ Cumplida |
 | HU-07 | Contacto con el mentor vía Teams | Comunidad y Soporte | ⚠ Cumplida con notas (ver detalle) |
+| HU-38 | Buscar y filtrar en las preguntas frecuentes | Comunidad y Soporte | ✔ Cumplida |
+| HU-39 | Llevar al foro la materia sin mentor | Comunidad y Soporte | ✔ Cumplida |
 
 ✔ = verificado contra el código y la base de datos · ⚠ = funciona, con una diferencia honesta frente al criterio original (explicada abajo)
 
@@ -235,9 +237,28 @@ Como usuario de AGE, quiero abrir un chat privado en Teams con el mentor que sel
 - ✔ Botón de contacto visible en la ficha de cada mentor (modal "Contactar")
 - ✔ Al pulsarlo abre un chat privado en Teams mediante deep link (`teams.microsoft.com/l/chat/0/0?users=...`)
 - ✔ El enlace se construye con el `email_institucional` del mentor
-- ✔ Ofrece alternativa por correo ("¿No tienes Teams? Escribir por correo") si Teams no está disponible
+- ✔ Ofrece alternativa por correo ("¿No tienes Teams? Escribir por correo") si Teams no está disponible — abre la redacción en Outlook web (`outlook.office.com`) con el correo del mentor y el asunto "Mentoría AGE - [materia]", en vez de `mailto:`, que dependía de tener un programa de correo instalado
 - ✔ Se registra el evento "contacto iniciado" en la tabla `contactos_mentor` para poder medir el uso
 - ⚠ **Nota honesta:** el criterio "funciona en navegador de escritorio y en la app móvil" no se ha probado dentro del APK de Android. El botón usa `window.open(..., "_blank")`; en el navegador abre Teams sin problema, pero dentro del WebView de Capacitor ese comportamiento no está verificado y no hay un plugin de apertura de enlaces externos instalado.
+
+#### HU-38 · Buscar y filtrar en las preguntas frecuentes
+Como usuario de AGE, quiero buscar por palabras y filtrar por categoría dentro de las preguntas frecuentes, para poder encontrar rápido la respuesta que necesito sin recorrer toda la lista. Requisito origen: F-13. Puntos de historia: 2. Prioridad: P(2).
+
+- ✔ Campo de búsqueda visible encima del listado de preguntas
+- ✔ La búsqueda encuentra coincidencias en la pregunta y en la respuesta
+- ✔ La búsqueda ignora mayúsculas y tildes ("matricula" encuentra "Matrícula")
+- ✔ Botones de categoría para filtrar, con opción "Todas"
+- ✔ La búsqueda y el filtro de categoría se pueden combinar
+- ✔ Si no hay coincidencias, muestra mensaje claro con opción de ver todas las preguntas
+- ✔ Si no hay coincidencias, ofrece llevar la duda al foro con el texto buscado como título
+
+#### HU-39 · Llevar al foro la materia sin mentor
+Como usuario de AGE, necesito una salida al foro cuando no encuentro mentor para mi materia, para poder pedir ayuda a la comunidad en vez de quedarme sin apoyo. Requisito origen: F-10. Puntos de historia: 1. Prioridad: P(2).
+
+- ✔ Enlace "¿No encuentras tu materia? Pregúntale a la comunidad en el foro" bajo el filtro de materias
+- ✔ Al pulsarlo lleva al foro con un título sugerido precargado
+- ✔ Si el filtro no arroja mentores, el mensaje ofrece también el botón "Preguntar en el foro" con la materia en el título
+- ⚠ **Nota honesta:** el filtro solo lista materias que ya tienen mentor, así que el mensaje "no hay mentores" no aparece usando la app normalmente. Por eso la salida principal es el enlace bajo el filtro, que siempre está visible.
 
 ### Cómo verificar el Sprint 2 a mano
 
@@ -246,4 +267,7 @@ Como usuario de AGE, quiero abrir un chat privado en Teams con el mentor que sel
 3. En cualquier pregunta, presionar "¿Aún con dudas?" → abre el foro con el título y la respuesta precargados.
 4. Entrar a "Mentores" desde el menú. Filtrar por una materia del desplegable y comprobar que la lista se reduce.
 5. Elegir una materia sin mentores (o vaciar el filtro y luego uno inexistente vía consola) para ver el mensaje "no hay mentores" con el botón "Ver todos los mentores".
-6. Abrir la ficha de un mentor ("Contactar") y probar los botones "Abrir chat en Teams" y "Escribir por correo".
+6. Abrir la ficha de un mentor ("Contactar") y probar los botones "Abrir chat en Teams" y "Escribir por correo" (este abre Outlook web).
+7. En Preguntas frecuentes, escribir "matricula" sin tilde en el buscador y comprobar que aparecen resultados; tocar una categoría y ver que solo quedan sus preguntas.
+8. Buscar algo que no exista (por ejemplo "horario del parqueadero") → mensaje "No encontramos preguntas…"; "Preguntar en el foro" abre el foro con ese texto como título.
+9. En Mentores, pulsar "¿No encuentras tu materia? Pregúntale a la comunidad en el foro" → abre el foro con "Busco ayuda con una materia" como título.

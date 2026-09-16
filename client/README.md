@@ -272,7 +272,9 @@ Los smoke tests existentes (`npm test`, con `TEST_EMAIL` / `TEST_PASSWORD` en `c
 | HU-04 FAQ | `/faqs` | `pages/FaqsPage.jsx` | `faqs.service.js` (`getFaqs`, `agruparPorCategoria`), tabla `faqs` |
 | HU-05 FAQ → foro | `/faqs`, `/foro` | `pages/FaqsPage.jsx` (botón "¿Aún con dudas?"), `pages/Foro.jsx` (lee `location.state`) | `faqs.service.js` |
 | HU-06 Directorio de mentores | `/mentores` | `pages/Mentores.jsx` (filtro, estado vacío, tarjetas) | `mentores.service.js` (`getMentores`, `getMaterias`), tabla `mentores` |
-| HU-07 Contacto por Teams | `/mentores` | `pages/Mentores.jsx` (modal "Contactar") | `mentores.service.js` (`construirEnlaceTeams`, `registrarContacto`), tabla `contactos_mentor` |
+| HU-07 Contacto por Teams | `/mentores` | `pages/Mentores.jsx` (modal "Contactar") | `mentores.service.js` (`construirEnlaceTeams`, `construirEnlaceOutlook`, `registrarContacto`), tabla `contactos_mentor` |
+| HU-38 Buscar y filtrar FAQ | `/faqs` | `pages/FaqsPage.jsx` (buscador, botones de categoría, estado sin resultados) | `faqs.service.js` (`filtrarFaqs`, `agruparPorCategoria`) |
+| HU-39 Materia sin mentor → foro | `/mentores`, `/foro` | `pages/Mentores.jsx` (enlace bajo el filtro y botón en el estado vacío), `pages/Foro.jsx` (lee `location.state`) | — |
 
 ### Brechas conocidas del Sprint 2 ⚠️
 
