@@ -16,7 +16,7 @@ export default function Dashboard() {
             Bienvenido al Asistente General Estudiantil
           </h1>
           <p className="text-sm text-negro-txt leading-relaxed">
-            Aqui podras encontrar información general relevante
+            Aquí podrás encontrar información general relevante
             <br />
             dentro de la institución
           </p>

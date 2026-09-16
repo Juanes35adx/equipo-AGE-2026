@@ -88,8 +88,8 @@ export default function QuickAccessGrid() {
       {/* Encabezado. La búsqueda vive en el acceso "Buscar" (/buscar). */}
       <h2 className="text-lg font-bold text-negro-txt mb-1">Accesos Rápidos</h2>
 
-      <p className="text-xs text-negro-txt mb-4">
-        Aqui puedes encontrar accesos rapidos al aplicativo
+      <p className="text-sm text-negro-txt leading-relaxed mb-4">
+        Aquí puedes encontrar accesos rápidos al aplicativo
       </p>
 
        {/* Botones cuadrados: 3×2 en celular y tablet, una fila de 6 desde lg para llenar el ancho */}
