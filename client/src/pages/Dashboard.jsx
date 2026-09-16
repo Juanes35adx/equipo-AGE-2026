@@ -9,8 +9,9 @@ export default function Dashboard() {
     <div >
       <Header />
       {/* Header */}
-      <main className=" px-8 pt-7 border-gray-200 animate-[fadeIn_0.5s_ease-out] py-8">
-        <div >
+      <main className="max-w-6xl mx-auto px-8 pt-7 border-gray-200 animate-[fadeIn_0.5s_ease-out] py-8">
+        {/* Mismo margen lateral (px-5) que las secciones de Novedades y Accesos Rápidos */}
+        <div className="px-5">
           <h1 className="text-xl font-bold text-negro-txt mb-1">
             Bienvenido al Asistente General Estudiantil
           </h1>

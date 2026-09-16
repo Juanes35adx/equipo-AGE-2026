@@ -92,9 +92,9 @@ export default function QuickAccessGrid() {
         Aqui puedes encontrar accesos rapidos al aplicativo
       </p>
 
-       {/* Grid 3×2 */}
-       <div className="w-full">
-        <div className="grid grid-cols-3 gap-3 w-full">
+       {/* Botones cuadrados: 3×2 en celular y tablet, una fila de 6 desde lg para llenar el ancho */}
+       <div className="w-full max-w-2xl lg:max-w-none">
+        <div className="grid grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-5 w-full">
           {QUICK_ITEMS.map((item) => (
             <QuickAccessItem key={item.id} {...item} onClick={() => navigate(item.path)} />
           ))}

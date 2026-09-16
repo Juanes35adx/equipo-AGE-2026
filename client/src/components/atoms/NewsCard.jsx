@@ -6,7 +6,7 @@ export default function NewsCard({ image, fallbackBg = "#c9bfb0", title, descrip
   const showFallback = imgError || !image;
 
   return (
-    <div className="w-64 sm:w-72 rounded-xl overflow-hidden shadow-sm shrink-0 snap-start flex flex-col shadow-negro-txt hover:cursor-pointer">
+    <div className="w-64 sm:w-72 lg:w-auto lg:basis-72 lg:grow rounded-xl overflow-hidden shadow-sm shrink-0 snap-start flex flex-col shadow-negro-txt hover:cursor-pointer">
       {/* Zona de imagen */}
       {renderImage ? (
         renderImage()
