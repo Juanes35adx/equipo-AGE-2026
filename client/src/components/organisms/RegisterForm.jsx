@@ -190,7 +190,7 @@ export default function RegisterForm() {
       <p className="m-0 text-center text-[0.8125rem] text-[#888]">
         ¿Ya tienes cuenta?{" "}
         <span
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/Login")}
           className="cursor-pointer font-medium text-negro-txt underline"
         >
           Inicia sesión
