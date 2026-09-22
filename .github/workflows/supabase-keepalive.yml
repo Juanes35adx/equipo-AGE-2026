@@ -1,0 +1,41 @@
+# Evita que Supabase pause el proyecto en el plan gratis (se pausa tras 7 días sin actividad).
+# Dos veces por semana hace una consulta pequeña a la API; si la base no responde,
+# el workflow falla y GitHub envía un correo avisando.
+# A partir de FECHA_FIN deja de consultar, y Supabase puede volver a pausar el proyecto.
+name: Mantener Supabase activo
+
+env:
+  FECHA_FIN: "2026-12-01"
+
+on:
+  schedule:
+    # Lunes y jueves a las 13:00 UTC (8:00 a. m. en Colombia).
+    - cron: "0 13 * * 1,4"
+  workflow_dispatch: # Permite correrlo a mano desde la pestaña Actions.
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Consultar la base de datos
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          if [ "$(date -u +%F)" \> "$FECHA_FIN" ] || [ "$(date -u +%F)" = "$FECHA_FIN" ]; then
+            echo "Desde el $FECHA_FIN ya no se mantiene activo el proyecto. No se hace la consulta."
+            exit 0
+          fi
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "Faltan los secretos SUPABASE_URL o SUPABASE_ANON_KEY en el repositorio."
+            exit 1
+          fi
+          codigo=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 \
+            "$SUPABASE_URL/rest/v1/ubicaciones?select=codigo&limit=1" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY")
+          echo "Respuesta de Supabase: $codigo"
+          if [ "$codigo" != "200" ]; then
+            echo "La base no respondió bien. Puede estar pausada: reactívala desde el panel de Supabase."
+            exit 1
+          fi
