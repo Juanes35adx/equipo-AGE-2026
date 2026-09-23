@@ -4,7 +4,7 @@ import Header from "../components/organisms/Header2"
 import Footer from "../components/organisms/Footer"
 import {
   getMentores,
-  getMaterias,
+  getMateriasDelPrograma,
   construirEnlaceTeams,
   construirEnlaceOutlook,
   registrarContacto,
@@ -12,6 +12,7 @@ import {
 
 export default function Mentores() {
   const [mentores, setMentores] = useState([]);
+  const [materias, setMaterias] = useState([]);
   const [materiaSeleccionada, setMateriaSeleccionada] = useState("");
   const [mentorActivo, setMentorActivo] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -19,8 +20,8 @@ export default function Mentores() {
   const carruselRef = useRef(null);
   const navigate = useNavigate();
 
-  // El filtro solo lista materias que ya tienen mentor; si la del estudiante no está,
-  // lo llevamos al foro con el asunto precargado.
+  // Si la materia del estudiante no está en el filtro, lo llevamos al foro
+  // con el asunto precargado.
   const irAlForo = (materia) =>
     navigate("/foro", {
       state: { tituloSugerido: materia ? `Busco ayuda con ${materia}` : "Busco ayuda con una materia" },
@@ -28,12 +29,14 @@ export default function Mentores() {
 
   useEffect(() => {
     getMentores()
-      .then(setMentores)
+      .then((lista) => {
+        setMentores(lista);
+        // Las materias se piden aparte porque incluyen las que se quedaron sin mentor activo.
+        return getMateriasDelPrograma(lista).then(setMaterias);
+      })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, []);
-
-  const materias = useMemo(() => getMaterias(mentores), [mentores]);
 
   const mentoresFiltrados = useMemo(
     () =>

@@ -27,6 +27,21 @@ export function getMaterias(mentores) {
 }
 
 /**
+ * Trae todas las materias del programa de mentoría, incluidas aquellas cuyos mentores
+ * están inactivos. La política RLS de `mentores` solo deja ver las filas activas, así que
+ * sin esto el filtro nunca podría ofrecer una materia que se quedó sin mentor disponible.
+ * Si la consulta falla, se cae al listado derivado de los mentores visibles.
+ *
+ * @param {Array} mentores Mentores activos, usados como respaldo.
+ * @returns {Promise<Array<string>>} Materias sin repetir, en orden alfabético.
+ */
+export async function getMateriasDelPrograma(mentores = []) {
+  const { data, error } = await supabase.rpc("materias_mentoria");
+  if (error || !data?.length) return getMaterias(mentores);
+  return data.sort((a, b) => a.localeCompare(b, "es"));
+}
+
+/**
  * Construye el deep link para abrir un chat privado en Microsoft Teams.
  * @param {string} email Correo institucional del mentor.
  * @returns {string} URL del chat de Teams.
