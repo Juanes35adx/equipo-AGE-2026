@@ -218,6 +218,8 @@ Los últimos tres viven en `/services` pero no tocan la base de datos — la car
 | `eventos` / `inscripciones_evento` | Actividades e inscripciones |
 | `profesores` | Directorio de profesores |
 
+> **Materias del filtro de mentores:** la política RLS de `mentores` solo deja ver las filas con `activo = true`, así que el cliente no puede saber qué materias se quedaron sin mentor disponible. Para eso existe la función `materias_mentoria()` (`security definer`), que devuelve **solo los nombres** de las materias — nunca datos de mentores inactivos — y permite que el filtro ofrezca una materia sin mentores y se muestre el mensaje correspondiente.
+
 > **Creación del perfil:** un trigger de la base de datos (`on_auth_user_created`) crea la fila en `profiles` cada vez que se agrega un usuario a `auth.users`, sin importar cómo. Luego `register()` la completa con los datos del formulario usando `upsert`. Antes de que existiera este trigger, una cuenta creada fuera del formulario quedaba sin perfil y rompía todas las llaves foráneas que apuntaban a ella.
 
 Datos locales (no están en la BD):
@@ -271,7 +273,7 @@ Los smoke tests existentes (`npm test`, con `TEST_EMAIL` / `TEST_PASSWORD` en `c
 |---|---|---|---|
 | HU-04 FAQ | `/faqs` | `pages/FaqsPage.jsx` | `faqs.service.js` (`getFaqs`, `agruparPorCategoria`), tabla `faqs` |
 | HU-05 FAQ → foro | `/faqs`, `/foro` | `pages/FaqsPage.jsx` (botón "¿Aún con dudas?"), `pages/Foro.jsx` (lee `location.state`) | `faqs.service.js` |
-| HU-06 Directorio de mentores | `/mentores` | `pages/Mentores.jsx` (filtro, estado vacío, tarjetas) | `mentores.service.js` (`getMentores`, `getMaterias`), tabla `mentores` |
+| HU-06 Directorio de mentores | `/mentores` | `pages/Mentores.jsx` (filtro, estado vacío, tarjetas) | `mentores.service.js` (`getMentores`, `getMateriasDelPrograma`), tabla `mentores`, función `materias_mentoria()` |
 | HU-07 Contacto por Teams | `/mentores` | `pages/Mentores.jsx` (modal "Contactar") | `mentores.service.js` (`construirEnlaceTeams`, `construirEnlaceOutlook`, `registrarContacto`), tabla `contactos_mentor` |
 | HU-38 Buscar y filtrar FAQ | `/faqs` | `pages/FaqsPage.jsx` (buscador, botones de categoría, estado sin resultados) | `faqs.service.js` (`filtrarFaqs`, `agruparPorCategoria`) |
 | HU-39 Materia sin mentor → foro | `/mentores`, `/foro` | `pages/Mentores.jsx` (enlace bajo el filtro y botón en el estado vacío), `pages/Foro.jsx` (lee `location.state`) | — |

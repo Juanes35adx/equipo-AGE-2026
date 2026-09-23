@@ -227,7 +227,7 @@ Como usuario de AGE, quiero filtrar los mentores disponibles por materia, para p
 - ✔ Listado de mentores cargado desde la tabla `mentores`, no quemado en el código
 - ✔ Filtro por materia aplicable sobre el listado
 - ✔ Cada mentor muestra nombre, tipo de tutor y materia
-- ✔ Si el filtro no arroja coincidencias, muestra mensaje claro y un botón "Ver todos los mentores"
+- ✔ Si el filtro no arroja coincidencias, muestra mensaje claro y un botón "Ver todos los mentores" — el desplegable lista **todas** las materias del programa (función `materias_mentoria()` en la base), no solo las que hoy tienen mentor activo, así que este caso sí se puede ver desde la app
 - ✔ Solo se muestran los mentores marcados como `activo = true`
 - ⚠ **Nota honesta:** los 10 mentores de la base de datos son **datos de prueba** (insertados a mano para poder probar el flujo), no el directorio real de tutores de la UPB. Los correos siguen el formato institucional (`nombre.apellido@upb.edu.co`), pero no corresponden a personas reales — escribirles por Teams no llega a nadie.
 
@@ -258,7 +258,6 @@ Como usuario de AGE, necesito una salida al foro cuando no encuentro mentor para
 - ✔ Enlace "¿No encuentras tu materia? Pregúntale a la comunidad en el foro" bajo el filtro de materias
 - ✔ Al pulsarlo lleva al foro con un título sugerido precargado
 - ✔ Si el filtro no arroja mentores, el mensaje ofrece también el botón "Preguntar en el foro" con la materia en el título
-- ⚠ **Nota honesta:** el filtro solo lista materias que ya tienen mentor, así que el mensaje "no hay mentores" no aparece usando la app normalmente. Por eso la salida principal es el enlace bajo el filtro, que siempre está visible.
 
 ### Cómo verificar el Sprint 2 a mano
 
@@ -266,7 +265,7 @@ Como usuario de AGE, necesito una salida al foro cuando no encuentro mentor para
 2. FAQ: las preguntas aparecen agrupadas por categoría, con la respuesta siempre visible y un enlace "Ver en página oficial".
 3. En cualquier pregunta, presionar "¿Aún con dudas?" → abre el foro con el título y la respuesta precargados.
 4. Entrar a "Mentores" desde el menú. Filtrar por una materia del desplegable y comprobar que la lista se reduce.
-5. Elegir una materia sin mentores (o vaciar el filtro y luego uno inexistente vía consola) para ver el mensaje "no hay mentores" con el botón "Ver todos los mentores".
+5. Elegir **Química General**, que hoy no tiene mentor activo, para ver el mensaje "No hay mentores disponibles…" con los botones "Ver todos los mentores" y "Preguntar en el foro".
 6. Abrir la ficha de un mentor ("Contactar") y probar los botones "Abrir chat en Teams" y "Escribir por correo" (este abre Outlook web).
 7. En Preguntas frecuentes, escribir "matricula" sin tilde en el buscador y comprobar que aparecen resultados; tocar una categoría y ver que solo quedan sus preguntas.
 8. Buscar algo que no exista (por ejemplo "horario del parqueadero") → mensaje "No encontramos preguntas…"; "Preguntar en el foro" abre el foro con ese texto como título.
