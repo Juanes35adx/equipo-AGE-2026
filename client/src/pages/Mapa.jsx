@@ -39,13 +39,22 @@ export default function Mapa() {
   const selectedPoi = selectedPoiElegido ?? puntoDesdeActividad;
   const focusPoi = focusPoiElegido ?? puntoDesdeActividad;
 
-  /** Lugares que coinciden con lo escrito en la búsqueda. */
+  /** Normaliza para búsqueda: minúsculas y sin tildes (igual que faqs.service). */
+  const normalizar = (s) =>
+    (s ?? "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+
+  /** Lugares que coinciden con lo escrito en la búsqueda (HU-36). */
   const resultados = useMemo(() => {
-    const q = consulta.trim().toLowerCase();
+    const q = normalizar(consulta.trim());
     if (!q) return [];
     return puntos.filter((p) =>
-      p.name.toLowerCase().includes(q) ||
-      (p.description ?? "").toLowerCase().includes(q)
+      normalizar(p.name).includes(q) ||
+      normalizar(p.description).includes(q) ||
+      normalizar(p.codigo).includes(q) ||
+      normalizar(p.edificio).includes(q)
     ).slice(0, 8);
   }, [consulta, puntos]);
 
@@ -75,8 +84,12 @@ export default function Mapa() {
                 type="text"
                 value={consulta}
                 onChange={(e) => setConsulta(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && resultados.length > 0) irAlLugar(resultados[0]);
+                }}
                 placeholder="Buscar un lugar del campus..."
                 aria-label="Buscar un lugar dentro del mapa"
+                role="searchbox"
                 className="flex-1 border border-[#ddd] rounded-lg py-2 px-3 text-sm text-negro-txt focus:outline-none focus:ring-2 focus:ring-[#e3001b]/40"
               />
               {consulta && (

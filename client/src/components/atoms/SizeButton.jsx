@@ -2,20 +2,30 @@ import Button from "./Button";
 import React,  {useState} from "react";
 import { useEffect } from "react";
 
-export default function SizeButton(){
-    const [scale, setScale] = useState(1);
-    useEffect(() => {
+function leerEscalaInicial() {
+    try {
         const saved = localStorage.getItem('font-scale');
-        if (saved) setScale(parseFloat(saved));
-    }, []);
+        if (saved) return parseFloat(saved);
+    } catch {
+        // SSR o almacenamiento bloqueado: usa el valor base
+    }
+    return 1;
+}
+
+export default function SizeButton(){
+    const [scale, setScale] = useState(leerEscalaInicial);
 
     useEffect(() => {
         document.documentElement.style.fontSize = `${scale * 16}px`;
-        localStorage.setItem('font-scale', scale);
+        try {
+            localStorage.setItem('font-scale', scale);
+        } catch {
+            // ignorar: el ajuste visual ya se aplicó
+        }
     }, [scale]);
 
     return(
-        <div>
+        <div aria-live="polite" title={`Tamaño de texto ${Math.round(scale * 100)}%`}>
             <Button 
                 text="A-"
                 onClick={() => setScale(s => Math.max(0.875, s - 0.125))}

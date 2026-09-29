@@ -1,11 +1,14 @@
 /**
- * Significado de cada color de pin en el mapa.
- * Debe coincidir con PIN_COLORS de components/atoms/Marker.jsx.
+ * Significado de cada color de pin en el mapa (HU-35).
+ * Amarillo = bloques, Rojo = comida, Negro = porterías.
+ * Debe coincidir con PIN_COLORS de components/atoms/Marker.jsx
+ * y con .marker-pin[data-type] de index.css.
+ * Reusa la paleta del @theme: --color-amarillo-xbtn, --color-rojo-enf, --color-negro-txt.
  */
 export const PIN_LEYENDA = [
-  { tipo: "bloque",   color: "#6f42c1", etiqueta: "Bloques y facultades" },
-  { tipo: "comida",   color: "#fd7e14", etiqueta: "Comida y cafeterías" },
-  { tipo: "porteria", color: "#0d6efd", etiqueta: "Porterías y entradas" },
+  { tipo: "bloque",   color: "#FFA800", etiqueta: "Bloques y facultades" },
+  { tipo: "comida",   color: "#E3001B", etiqueta: "Comida y cafeterías" },
+  { tipo: "porteria", color: "#000000", etiqueta: "Porterías y entradas" },
 ];
 
 /**

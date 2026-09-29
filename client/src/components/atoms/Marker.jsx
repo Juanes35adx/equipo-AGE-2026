@@ -1,13 +1,58 @@
+// HU-35: amarillo = bloques, rojo = comida, negro = porterías.
+// Reusa la paleta del @theme (amarillo-xbtn, rojo-enf, negro-txt).
 // Las claves se comparan en minuscula contra poi.type, para que los datos
 // puedan venir como "Porteria" o "porteria" sin perder el color.
-const PIN_COLORS = {
-  porteria:  "#0d6efd",
-  comida:      "#fd7e14",
-  bloque:  "#6f42c1",
-  parqueadero: "#dc3545",
-  servicios:      "#198754",
-  default:   "#1a73e8",
+// Tipos fuera de estos 3 (ej. parqueadero, servicios legacy) caen a default negro.
+export const PIN_COLORS = {
+  bloque:  "#FFA800",
+  comida:      "#E3001B",
+  porteria:  "#000000",
+  parqueadero: "#000000",
+  servicios:      "#000000",
+  default:   "#000000",
 };
+
+export function colorDePin(poi) {
+  const tipo = String(poi?.type ?? "").toLowerCase();
+  return PIN_COLORS[tipo] ?? PIN_COLORS.default;
+}
+
+/**
+ * HTML para el divIcon de Leaflet (sin API key). Mismo lenguaje visual
+ * que el pin de Google: gota rotada + emoji + etiqueta.
+ */
+export function htmlDePin(poi) {
+  const color = colorDePin(poi);
+  const icono = poi?.icon ?? "📍";
+  const nombre = String(poi?.name ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+  return (
+    `<div style="display:flex;flex-direction:column;align-items:center;cursor:pointer;user-select:none;">` +
+    `<div style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;` +
+    `border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:${color};` +
+    `box-shadow:0 2px 8px rgba(0,0,0,0.35);">` +
+    `<span style="display:block;transform:rotate(45deg);font-size:16px;line-height:1;">${icono}</span>` +
+    `</div>` +
+    `<div style="margin-top:4px;padding:2px 6px;background:rgba(255,255,255,0.92);border-radius:4px;` +
+    `font-size:11px;font-weight:600;white-space:nowrap;color:#1a1a1a;` +
+    `box-shadow:0 1px 4px rgba(0,0,0,0.2);pointer-events:none;">${nombre}</div>` +
+    `</div>`
+  );
+}
+
+/** HTML del punto azul del usuario con pulso (Leaflet). */
+export function htmlDeUsuario() {
+  return (
+    `<div style="position:relative;width:20px;height:20px;">` +
+    `<div style="position:absolute;inset:-6px;background:rgba(66,133,244,0.25);border-radius:50%;` +
+    `animation:age-pulse 2s ease-out infinite;"></div>` +
+    `<div style="position:absolute;inset:3px;background:#4285f4;border:2px solid #fff;border-radius:50%;` +
+    `box-shadow:0 0 0 2px rgba(66,133,244,0.5);z-index:1;"></div>` +
+    `</div>`
+  );
+}
  
 
 export function createCustomMarker(poi) {

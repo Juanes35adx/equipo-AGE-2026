@@ -7,13 +7,18 @@ import Footer from "../components/organisms/Footer";
 import Button from "../components/atoms/Button";
 
 export default function Perfil() {
-  const [profile, setProfile] = useState([]);
+  const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
       getProfile()
-        .then(setProfile)
+        .then((p) => {
+          setProfile(p);
+          setError(null);
+        })
+        .catch((e) => setError(e.message))
         .finally(() => setLoading(false));
   }, []);
   
@@ -21,6 +26,9 @@ export default function Perfil() {
     await logout();
     navigate("/LogOut");
   };
+
+  // HU-27: ID corto (8 primeros del UUID) con UUID completo en tooltip
+  const idCorto = profile?.profile_id ? String(profile.profile_id).slice(0, 8) : "—";
 
   return (
     <div className="flex flex-col flex-1 relative min-h-screen">
@@ -34,11 +42,13 @@ export default function Perfil() {
             }
           `}
         </style>
-        <h1 className="text-[1.8rem] md:text-[2.2rem] font-bold text-negro-txt mb-6 md:mb-8 text-center md:text-left">Usuario, {profile.full_name}</h1>
+        <h1 className="text-[1.8rem] md:text-[2.2rem] font-bold text-negro-txt mb-6 md:mb-8 text-center md:text-left">Usuario, {profile?.full_name ?? ""}</h1>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start">
-          {/* Tarjeta de Información Personal */}
-          {loading ? <p>Cargando...</p> : (
+          {/* Tarjeta de Información Personal (HU-27) */}
+          {loading ? <p>Cargando...</p> : error ? (
+            <p role="alert" className="text-[#e3001b]">No se pudo cargar tu perfil: {error}</p>
+          ) : (
             <div className="bg-rosa-menu rounded-sm py-8 md:py-12 px-6 md:px-8 flex flex-col shadow-[0_0.5rem_1.875rem_rgba(0,0,0,0.06)] transition-transform duration-300 hover:-translate-y-1 hover:shadow-[0_0.75rem_2.5rem_rgba(0,0,0,0.1)]">
             <div className="w-24 h-24 md:w-37.5 md:h-37.5 bg-transparent text-[#242424] mx-auto mb-6 md:mb-8">
               <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full rounded-full drop-shadow-[0_0.25rem_0.625rem_rgba(0,0,0,0.15)]">
@@ -50,6 +60,9 @@ export default function Perfil() {
               <p className="text-[1rem] md:text-[1.1rem] text-griso-prf leading-relaxed wrap-break-words"><strong>Nombre:</strong> {profile.full_name} </p>
               <p className="text-[1rem] md:text-[1.1rem] text-griso-prf leading-relaxed wrap-break-words"><strong>Correo:</strong> {profile.email} </p>
               <p className="text-[1rem] md:text-[1.1rem] text-griso-prf leading-relaxed wrap-break-words"><strong>Cursando:</strong> {profile.programa} </p>
+              <p className="text-[1rem] md:text-[1.1rem] text-griso-prf leading-relaxed wrap-break-words" title={profile.profile_id ?? ""}>
+                <strong>ID:</strong> {idCorto}
+              </p>
               <p className="text-[1rem] md:text-[1.1rem] text-griso-prf leading-relaxed wrap-break-words"><strong>Semestre:</strong> {profile.semestre ?? "—"} </p>
             </div>
           </div>
