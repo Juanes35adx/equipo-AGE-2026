@@ -270,3 +270,100 @@ Como usuario de AGE, necesito una salida al foro cuando no encuentro mentor para
 7. En Preguntas frecuentes, escribir "matricula" sin tilde en el buscador y comprobar que aparecen resultados; tocar una categoría y ver que solo quedan sus preguntas.
 8. Buscar algo que no exista (por ejemplo "horario del parqueadero") → mensaje "No encontramos preguntas…"; "Preguntar en el foro" abre el foro con ese texto como título.
 9. En Mentores, pulsar "¿No encuentras tu materia? Pregúntale a la comunidad en el foro" → abre el foro con "Busco ayuda con una materia" como título.
+
+---
+
+## Sprint 3 — Mapa, Perfil y Accesibilidad
+
+Tercer sprint del proyecto. Cubre el mapa interactivo del campus (ubicación en tiempo real, puntos de interés, bloques cercanos, leyenda y búsqueda), la consulta del perfil y los ajustes de accesibilidad. Todo lo de esta sección describe **únicamente el Sprint 3**; el resto del documento no cambia.
+
+**Épicas:** Mapa Interactivo · Inicio · Accesibilidad
+
+> **Cambio de tecnología del mapa:** el 29 de septiembre de 2026 el mapa migró de Google Maps a **Leaflet + OpenStreetMap**. Ya no necesita API key ni tarjeta de crédito, y la variable `VITE_GOOGLE_API_KEY` dejó de usarse.
+
+### Historias de usuario del sprint
+
+| HU | Historia | Épica | Estado |
+|---|---|---|---|
+| HU-08 | Ubicación en tiempo real en el campus | Mapa Interactivo | ⚠ Cumplida con notas (ver detalle) |
+| HU-09 | Puntos de interés en el mapa | Mapa Interactivo | ⚠ Cumplida con notas (ver detalle) |
+| HU-30 | Bloques cercanos en el mapa | Mapa Interactivo | ⚠ Cumplida con notas (ver detalle) |
+| HU-35 | Leyenda de colores del mapa | Mapa Interactivo | ✔ Cumplida |
+| HU-36 | Buscar un lugar dentro del mapa | Mapa Interactivo | ✔ Cumplida |
+| HU-27 | Consultar mi perfil | Inicio | ⚠ Cumplida con notas (ver detalle) |
+| HU-28 | Ajustes de accesibilidad | Accesibilidad | ✔ Cumplida |
+
+✔ = verificado contra el código y la base de datos · ⚠ = funciona, con una diferencia honesta frente al criterio original (explicada abajo)
+
+### Detalle por historia
+
+#### HU-08 · Ubicación en tiempo real en el campus
+Como usuario de AGE, quiero ver mi ubicación en tiempo real sobre el plano del campus, para poder orientarme mientras me encuentro dentro de la universidad. Requisito origen: F-03 / RF-1. Puntos de historia: 3. Prioridad: P(0).
+
+- ✔ Solicitud explícita de permisos de geolocalización: botón "📍 Mostrar mi ubicación"; el permiso no se pide al entrar, solo al pulsarlo
+- ✔ Plano del campus UPB Laureles renderizado con Leaflet + OpenStreetMap, limitado a los bordes del campus
+- ✔ Marcador azul que representa la posición actual del usuario, con un círculo que indica la precisión en metros
+- ✔ La posición se actualiza conforme el usuario se desplaza (seguimiento continuo con `watchPosition`)
+- ✔ Si se deniega el permiso, muestra un mensaje claro, explica que el mapa, la búsqueda y los bloques cercanos siguen funcionando, y ofrece "Reintentar"
+- ✔ El mapa principal carga en menos de 3 segundos (NF-02): medido el 30/09/2026 en **~1,5 s** hasta el último cuadro visible del mapa
+- ⚠ **Nota honesta:** la medición de NF-02 se hizo en un computador de escritorio con el servidor de desarrollo, no en un celular con datos móviles. El seguimiento en tiempo real está implementado, pero no se ha probado caminando por el campus.
+
+#### HU-09 · Puntos de interés en el mapa
+Como usuario de AGE, quiero hacer clic en los puntos de interés del mapa, para poder consultar información corta y una imagen de referencia de cada lugar. Requisito origen: F-03 / RF-2. Puntos de historia: 2. Prioridad: P(0).
+
+- ✔ Marcadores ubicados sobre cada sitio relevante del campus: 35 ubicaciones activas
+- ✔ Al hacer clic en un marcador se despliega su información en el panel lateral
+- ✔ Los puntos están clasificados por tipo: 22 bloques, 9 de comida y 4 porterías
+- ✔ La información se carga desde la tabla `ubicaciones` de Supabase
+- ⚠ **Nota honesta:** el criterio pide nombre, descripción corta **e imagen** en cada punto. Los 35 tienen nombre y descripción, pero solo **20 tienen imagen**: faltan los 9 puntos de comida, las 4 porterías, el Bulevar Bloque 12 y el Gimnasio UPB. En esos casos el panel muestra la información sin foto.
+
+#### HU-30 · Bloques cercanos en el mapa
+Como usuario de AGE, quiero ver los bloques cercanos sobre el mapa, para poder reconocer qué tengo alrededor. Origen: imagen de diseño `mapa.png`.
+
+- ✔ Sección "Bloques Cercanos" con fotografías de los bloques y su distancia en metros
+- ✔ Al pulsar un bloque cercano, el mapa se centra en él y abre su detalle
+- ⚠ **Nota honesta:** los criterios piden un panel **sobre el mapa** con los bloques **de la zona visible**. Lo implementado es distinto: la sección aparece en el panel lateral, al lado del mapa, después de elegir un lugar, y muestra los **3 bloques más cercanos a ese lugar** (distancia calculada con la fórmula de Haversine). No depende de la zona visible del mapa.
+
+#### HU-35 · Leyenda de colores del mapa
+Como usuario de AGE, quiero una leyenda que explique el color de cada pin, para poder interpretar el mapa sin tener que adivinar. Origen: Mural, columna "Mapa".
+
+- ✔ Leyenda visible justo debajo del mapa
+- ✔ Pin amarillo: bloques y facultades
+- ✔ Pin rojo: comida y cafeterías
+- ✔ Pin negro: porterías y entradas
+
+#### HU-36 · Buscar un lugar dentro del mapa
+Como usuario de AGE, quiero buscar un lugar dentro del mapa, para poder ubicarlo sin recorrer todos los pines uno por uno. Origen: Mural, columna "Mapa".
+
+- ✔ Campo de búsqueda encima del mapa ("Buscar un lugar del campus..."); busca por nombre, descripción, código y edificio, sin importar tildes ni mayúsculas
+- ✔ Al elegir un resultado (o pulsar Enter), el mapa se centra en el lugar encontrado
+- ✔ Se abre el panel de detalle de ese lugar
+- ✔ Mensaje claro cuando no se encuentra el lugar: "No encontramos ese lugar en el campus"
+
+#### HU-27 · Consultar mi perfil
+Como usuario de AGE, quiero ver mis datos y mis notificaciones en mi perfil, para poder confirmar mi información y enterarme de lo pendiente. Origen: imagen de diseño `perfil.png`.
+
+- ✔ Muestra Nombre, Correo, Cursando (programa) e ID del usuario, además del semestre
+- ✔ Botón "Cerrar Sesión"
+- ✔ Botón "SIGAA" que abre la plataforma institucional
+- ⚠ **Nota honesta:** el "ID" que se muestra son los primeros 8 caracteres del identificador interno de la cuenta en Supabase, no el ID de estudiante de la UPB (la base no guarda ese dato y el registro no lo pide). El área de notificaciones existe, pero siempre dice "No tienes ninguna notificación!": todavía no hay un sistema de notificaciones que la llene.
+
+#### HU-28 · Ajustes de accesibilidad
+Como usuario de AGE, quiero ajustar el tamaño del texto y el contraste, para poder leer la aplicación con comodidad. Origen: imagen de diseño `Accesibilidad.png`.
+
+- ✔ Icono de accesibilidad visible en el encabezado de todas las pantallas (en los dos headers)
+- ✔ Al pulsarlo despliega el panel de opciones; se cierra con Escape o al tocar fuera
+- ✔ Botón "A-" que reduce el tamaño del texto (mínimo 87,5 %)
+- ✔ Botón "A+" que aumenta el tamaño del texto (máximo 150 %)
+- ✔ Botón 🌓 que alterna el contraste (fondo negro con texto blanco)
+- ✔ Además, el tamaño y el contraste elegidos se conservan al cerrar y volver a abrir la app
+
+### Cómo verificar el Sprint 3 a mano
+
+1. `cd client; npm install; npm run dev`, iniciar sesión y entrar a "Mapa" desde el menú o los accesos rápidos.
+2. El plano del campus carga con pines amarillos, rojos y negros, y la leyenda debajo explica cada color.
+3. Pulsar "📍 Mostrar mi ubicación": el navegador pide permiso. Al aceptarlo aparece el punto azul; al negarlo, sale el mensaje con "Reintentar".
+4. Hacer clic en un pin: el panel lateral muestra nombre, foto (si tiene) y descripción, y debajo los 3 bloques más cercanos con su distancia.
+5. Escribir "biblioteca" en el buscador del mapa y elegir el resultado: el mapa se centra y abre su detalle. Buscar "xyz" muestra "No encontramos ese lugar en el campus".
+6. Entrar a "Perfil": se ven nombre, correo, programa, ID y semestre, y los botones "Cerrar Sesión" y "SIGAA".
+7. Pulsar el icono de accesibilidad del encabezado: "A+" y "A-" cambian el tamaño del texto y 🌓 alterna el contraste. Recargar la página y comprobar que el ajuste se mantiene.

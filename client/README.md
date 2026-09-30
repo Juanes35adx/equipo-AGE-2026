@@ -16,7 +16,7 @@ Aplicación web para estudiantes nuevos de la **Universidad Pontificia Bolivaria
 
 - **Bienvenida, inicio de sesión y registro** — gestionados con Supabase Auth. Al crear la cuenta, el usuario es redirigido a la pantalla de login y debe iniciar sesión con las credenciales nuevas.
 - **Dashboard** — mensaje de bienvenida, carrusel de novedades y cuadrícula de accesos rápidos a cada módulo
-- **Mapa del campus** — mapa interactivo de Google con 35 ubicaciones del campus, posición del usuario en vivo, leyenda de pines, búsqueda dentro del mapa y bloques cercanos
+- **Mapa del campus** — mapa interactivo (Leaflet + OpenStreetMap) con 35 ubicaciones del campus, posición del usuario en vivo, leyenda de pines, búsqueda dentro del mapa y bloques cercanos
 - **Búsqueda** — busca secciones de la app por palabra clave, con filtro de etiquetas (22 etiquetas)
 - **FAQ** — preguntas cargadas desde la base de datos, cada una con un enlace oficial y un botón "¿Aún con dudas?" que lleva al foro con la pregunta precargada
 - **Foro** — los estudiantes publican preguntas, responden, responden a respuestas (anidadas) y dan like a las publicaciones
@@ -35,7 +35,7 @@ Aplicación web para estudiantes nuevos de la **Universidad Pontificia Bolivaria
 | Enrutamiento | react-router-dom |
 | Estilos | Tailwind CSS v4 |
 | Móvil | Capacitor 8 (Android) |
-| Mapas | Google Maps JavaScript API |
+| Mapas | Leaflet + OpenStreetMap (sin API key) |
 | Geolocalización | `@capacitor/geolocation` |
 | Pruebas | Playwright (smoke tests) |
 | Linting | ESLint |
@@ -44,7 +44,7 @@ Aplicación web para estudiantes nuevos de la **Universidad Pontificia Bolivaria
 
 > ⚠️ **Aviso sobre Tailwind v4:** este proyecto usa **Tailwind CSS v4**, que tiene diferencias importantes frente a v3. Si usas herramientas de IA o documentación, asegúrate de que estén referenciando v4 — la mayoría todavía asume por defecto la sintaxis de v3.
 
-> ⚠️ **Google Maps necesita un Map ID.** El mapa usa `AdvancedMarkerElement`, que solo funciona con un `mapId` configurado. Como hay un `mapId` presente, Google **ignora** cualquier opción `styles` que se pase desde el código — el estilo del mapa (incluyendo ocultar los POI por defecto) debe configurarse en Google Cloud Console para ese Map ID.
+> ℹ️ **El mapa ya no usa Google Maps.** El 29 de septiembre de 2026 migró a **Leaflet** con los mapas libres de **OpenStreetMap**: no necesita API key, Map ID ni tarjeta de crédito. Los pines se dibujan con `L.divIcon` a partir de `components/atoms/Marker.jsx`.
 
 ---
 
@@ -54,7 +54,6 @@ Aplicación web para estudiantes nuevos de la **Universidad Pontificia Bolivaria
 
 - [Node.js 24 LTS](https://nodejs.org/) instalado (desarrollado con v24.14.0)
 - Credenciales del proyecto de Supabase
-- Una API key de Google Maps con Map ID
 
 ### 1. Entrar a la carpeta del frontend
 
@@ -68,6 +67,8 @@ cd client
 npm install
 ```
 
+> Hay que volver a correr `npm install` cada vez que un `git pull` traiga librerías nuevas en `package.json`. Si no, la página queda en blanco porque falta la librería (pasó con `leaflet` el 29 de septiembre).
+
 ### 3. Configurar las variables de entorno
 
 Crear un archivo `.env` dentro de **`client/`** (no en `server/`):
@@ -75,10 +76,9 @@ Crear un archivo `.env` dentro de **`client/`** (no en `server/`):
 ```
 VITE_SUPABASE_URL=tu_url_de_supabase
 VITE_SUPABASE_ANON_KEY=tu_anon_key
-VITE_GOOGLE_API_KEY=tu_clave_de_google_maps
 ```
 
-> Las tres son obligatorias. Si falta `VITE_GOOGLE_API_KEY` la app igual carga, pero el mapa se queda en blanco sin ningún error visible.
+> Las dos son obligatorias. `VITE_GOOGLE_API_KEY` ya no se usa desde la migración del mapa a Leaflet; si la tienes en tu `.env`, puedes borrarla.
 
 > Los valores reales se comparten en privado. **No** subir este archivo — ya está en `.gitignore`.
 
@@ -192,7 +192,7 @@ Todo lo que habla con el mundo exterior. Ninguna page o componente consulta Supa
 | `ubicaciones.service.js` | Ubicaciones del campus para el mapa |
 | `mapa.service.js` | Cálculos del mapa — distancias, bloques cercanos, leyenda de pines *(sin Supabase)* |
 | `location.service.js` | GPS del dispositivo y permiso en tiempo de ejecución *(sin Supabase)* |
-| `map.service.js` | Carga el SDK de Google Maps *(sin Supabase)* |
+| `map.service.js` | **Legado**: cargaba el SDK de Google Maps; tras la migración a Leaflet ya no se usa *(sin Supabase)* |
 
 Los últimos tres viven en `/services` pero no tocan la base de datos — la carpeta terminó significando "todo lo que no es interfaz".
 
@@ -282,3 +282,29 @@ Los smoke tests existentes (`npm test`, con `TEST_EMAIL` / `TEST_PASSWORD` en `c
 
 1. **HU-06:** las 10 filas de la tabla `mentores` son **datos de prueba** insertados a mano para probar el flujo, no el directorio real de tutores de la universidad. Los correos siguen el formato institucional real de la UPB (`nombre.apellido@upb.edu.co`) pero no pertenecen a personas reales.
 2. **HU-07:** "funciona en navegador de escritorio y en la app móvil" no se ha verificado dentro del APK de Android. El botón de contacto usa `window.open(..., "_blank")`; está confirmado que funciona en un navegador normal, pero su comportamiento dentro del WebView de Capacitor (sin plugin de enlaces externos instalado) no se ha probado en un dispositivo.
+
+---
+
+## Sprint 3 — trazabilidad de código 🧭
+
+> Alcance solo del sprint (Mapa, Perfil y Accesibilidad). Para los criterios de aceptación completos de cada historia, ver la sección **"Sprint 3"** en el `README.md` de la raíz del repo — nada de lo de abajo lo duplica.
+
+| HU | Ruta(s) | Pages / componentes | Servicio / dato |
+|---|---|---|---|
+| HU-08 Ubicación en tiempo real | `/mapa` | `pages/Mapa.jsx`, `organisms/MapInfo.jsx` (botón de ubicación, punto azul, círculo de precisión, mensaje de permiso denegado), `atoms/Marker.jsx` (`htmlDeUsuario`) | `location.service.js` (`getUserLocation`, `watchUserLocation`, `traducirErrorUbicacion`), `@capacitor/geolocation` |
+| HU-09 Puntos de interés | `/mapa` | `organisms/MapInfo.jsx` (pines con `L.divIcon`), `pages/Mapa.jsx` (panel lateral de detalle), `atoms/Marker.jsx` (`htmlDePin`) | `ubicaciones.service.js` (`getUbicaciones`, `aPunto`), tabla `ubicaciones` |
+| HU-30 Bloques cercanos | `/mapa` | `pages/Mapa.jsx` (sección "Bloques Cercanos" del panel lateral) | `mapa.service.js` (`bloquesCercanos`, `distanciaEnMetros`) |
+| HU-35 Leyenda de colores | `/mapa` | `pages/Mapa.jsx` (leyenda bajo el mapa), `atoms/Marker.jsx` (`PIN_COLORS`) | `mapa.service.js` (`PIN_LEYENDA`) |
+| HU-36 Buscar en el mapa | `/mapa` | `pages/Mapa.jsx` (buscador, lista de resultados, `irAlLugar`), `organisms/MapInfo.jsx` (`flyTo` al lugar elegido) | `ubicaciones.service.js` |
+| HU-27 Consultar mi perfil | `/perfil` | `pages/Perfil.jsx`, `atoms/Button.jsx` | `profile.service.js` (`getProfile`), `auth.service.js` (`logout`), tabla `profiles` |
+| HU-28 Accesibilidad | todas (por página) | `atoms/AccessButton.jsx`, `atoms/AccessOpts.jsx`, `atoms/SizeButton.jsx`, `atoms/ContrastButton.jsx`, usados en `organisms/Header2.jsx` e `organisms/IniHeader.jsx` | `localStorage` (`font-scale`, `contrast-mode`) |
+
+> **Pantallas conectadas al mapa:** desde Actividades se puede abrir el mapa centrado en el lugar de un evento; `pages/Mapa.jsx` lo recibe como `location.state.ubicacionId`.
+
+### Brechas conocidas del Sprint 3 ⚠️
+
+1. **HU-08:** el tiempo de carga (NF-02, ~1,5 s) se midió en escritorio con el servidor de desarrollo, no en un celular con datos móviles. El seguimiento en tiempo real (`watchPosition`) no se ha probado caminando por el campus.
+2. **HU-09:** de las 35 ubicaciones, 15 no tienen `imagen_url`: los 9 puntos de comida, las 4 porterías, `poi-013` (Bulevar Bloque 12) y `poi-017a` (Gimnasio UPB).
+3. **HU-30:** los bloques cercanos se calculan respecto al lugar **elegido** (los 3 más cercanos), no respecto a la zona visible del mapa, y se muestran en el panel lateral, no encima del mapa.
+4. **HU-27:** el "ID" son los primeros 8 caracteres de `profiles.profile_id` (UUID de Supabase Auth), no el ID de estudiante de la UPB, que no existe en la base. Las notificaciones son un texto fijo; no hay tabla ni lógica de notificaciones.
+5. **`map.service.js`** quedó como legado de Google Maps: ya nadie lo importa y se puede borrar.
