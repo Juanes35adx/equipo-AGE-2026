@@ -79,66 +79,70 @@ export default function Mapa() {
         <Header />
         <main className="flex-1 min-h-0 flex flex-col gap-3 w-full max-w-7xl mx-auto px-4 md:px-8 py-4">
 
-          {/* ── Título + buscador en una sola franja ───────────────────── */}
-          <div className="flex flex-col md:flex-row md:items-center gap-3 shrink-0">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => navigate("/dashboard")}
-                className="bg-transparent border-none cursor-pointer text-sm text-negro-txt/60 hover:text-negro-txt"
-              >
-                ← Volver
-              </button>
-              <h1 className="m-0 text-xl md:text-2xl font-medium text-negro-txt">Mapa del Campus UPB</h1>
-            </div>
-
-            {/* ── Buscar un lugar dentro del mapa ──────────────────────── */}
-            <div className="relative w-full md:w-96 md:ml-auto">
-              <div className="flex items-center gap-2">
-                <input
-                  type="text"
-                  value={consulta}
-                  onChange={(e) => setConsulta(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && resultados.length > 0) irAlLugar(resultados[0]);
-                  }}
-                  placeholder="Buscar un lugar del campus..."
-                  aria-label="Buscar un lugar dentro del mapa"
-                  role="searchbox"
-                  className="flex-1 border border-[#ddd] rounded-lg py-2 px-3 text-sm text-negro-txt focus:outline-none focus:ring-2 focus:ring-[#e3001b]/40"
-                />
-                {consulta && (
-                  <button
-                    onClick={() => setConsulta("")}
-                    aria-label="Limpiar búsqueda"
-                    className="w-8 h-8 rounded-full bg-gris-bg2 text-negro-txt font-bold cursor-pointer border-none"
-                  >
-                    X
-                  </button>
-                )}
+          {/* ── Título + buscador, encima de la columna del mapa ─────────── */}
+          <div className="flex flex-col md:flex-row gap-4 shrink-0">
+            <div className="flex flex-col lg:flex-row lg:items-center gap-3 lg:gap-6 md:flex-1 min-w-0">
+              <div className="flex items-center gap-4 shrink-0">
+                <button
+                  onClick={() => navigate("/dashboard")}
+                  className="bg-transparent border-none cursor-pointer text-sm text-negro-txt/60 hover:text-negro-txt"
+                >
+                  ← Volver
+                </button>
+                <h1 className="m-0 text-xl md:text-2xl font-medium text-negro-txt">Mapa del Campus UPB</h1>
               </div>
 
-              {consulta && (
-                <ul className="absolute z-40 left-0 right-0 mt-1 bg-blanco-bg border border-[#ddd] rounded-lg shadow-lg max-h-64 overflow-y-auto list-none p-0 m-0">
-                  {resultados.length === 0 ? (
-                    <li className="px-3 py-2 text-sm text-negro-txt/60">
-                      No encontramos ese lugar en el campus
-                    </li>
-                  ) : (
-                    resultados.map((p) => (
-                      <li key={p.id}>
-                        <button
-                          onClick={() => irAlLugar(p)}
-                          className="w-full text-left px-3 py-2 text-sm text-negro-txt bg-transparent border-none cursor-pointer hover:bg-gris-bg2"
-                        >
-                          <span className="mr-2">{p.icon ?? "📍"}</span>
-                          {p.name}
-                        </button>
-                      </li>
-                    ))
+              {/* ── Buscar un lugar dentro del mapa ──────────────────────── */}
+              <div className="relative w-full lg:flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={consulta}
+                    onChange={(e) => setConsulta(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && resultados.length > 0) irAlLugar(resultados[0]);
+                    }}
+                    placeholder="Buscar un lugar del campus..."
+                    aria-label="Buscar un lugar dentro del mapa"
+                    role="searchbox"
+                    className="flex-1 min-w-0 w-full border border-[#ddd] rounded-lg py-2 px-3 text-sm text-negro-txt focus:outline-none focus:ring-2 focus:ring-[#e3001b]/40"
+                  />
+                  {consulta && (
+                    <button
+                      onClick={() => setConsulta("")}
+                      aria-label="Limpiar búsqueda"
+                      className="w-8 h-8 rounded-full bg-gris-bg2 text-negro-txt font-bold cursor-pointer border-none"
+                    >
+                      X
+                    </button>
                   )}
-                </ul>
-              )}
+                </div>
+
+                {consulta && (
+                  <ul className="absolute z-40 left-0 right-0 mt-1 bg-blanco-bg border border-[#ddd] rounded-lg shadow-lg max-h-64 overflow-y-auto list-none p-0 m-0">
+                    {resultados.length === 0 ? (
+                      <li className="px-3 py-2 text-sm text-negro-txt/60">
+                        No encontramos ese lugar en el campus
+                      </li>
+                    ) : (
+                      resultados.map((p) => (
+                        <li key={p.id}>
+                          <button
+                            onClick={() => irAlLugar(p)}
+                            className="w-full text-left px-3 py-2 text-sm text-negro-txt bg-transparent border-none cursor-pointer hover:bg-gris-bg2"
+                          >
+                            <span className="mr-2">{p.icon ?? "📍"}</span>
+                            {p.name}
+                          </button>
+                        </li>
+                      ))
+                    )}
+                  </ul>
+                )}
+              </div>
             </div>
+            {/* Hueco del ancho del panel lateral: así el buscador termina donde termina el mapa */}
+            <div className="hidden md:block md:w-80 shrink-0" aria-hidden="true" />
           </div>
 
           {errorCarga && (
