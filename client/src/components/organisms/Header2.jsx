@@ -17,19 +17,20 @@ const Header2 = () => {
 
   return (
     <header className="sticky top-0 z-50 border-b border-negro-txt px-2 md:px-4 py-2 md:py-4 w-full">
-      <div className="flex items-center justify-between w-full h-14 md:h-16 mx-4">
+      {/* Sin w-full + mx-4: juntos medían 100 % + 16 px y en celular la página se desbordaba hacia el lado */}
+      <div className="flex items-center justify-between h-14 md:h-16">
 
         {/* Left: UPB Logo */}
           
           <img
           src="upb.png"
           alt="UPB Logo"
-          className="h-10 md:h-14 w-auto object-contain cursor-pointer ml-2 md:ml-4"
+          className="h-10 md:h-14 w-auto object-contain cursor-pointer ml-6 md:ml-8"
           onClick={() => navigate("/dashboard")}
           />
 
         {/* Right: Buttons (Perfil and Menú) */}
-        <div className="flex items-center px-1 mr-2 md:mr-4">
+        <div className="flex items-center px-1">
           <AccessButton />
           <Button
             text="Perfil"
