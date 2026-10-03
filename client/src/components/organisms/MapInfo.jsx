@@ -259,7 +259,9 @@ export default function MAPMap({ onMarkerSelect, focusPoi, puntos = [] }) {
   const aproximada = userPos?.accuracy != null && userPos.accuracy > PRECISION_APROXIMADA_M;
 
   return (
-    <div className="relative w-full h-full">
+    // isolate: las capas de Leaflet usan z-index de 200 a 1000; sin un contexto propio,
+    // al hacer scroll el mapa se montaba encima del encabezado fijo (z-50).
+    <div className="relative isolate w-full h-full">
       <div ref={mapRef} style={{ width: "100%", height: "100%", minHeight: "320px", borderRadius: "12px", overflow: "hidden" }} />
 
       {/* HU-08: solicitud explícita de permisos */}

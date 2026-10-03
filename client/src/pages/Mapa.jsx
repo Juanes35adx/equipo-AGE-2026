@@ -118,7 +118,7 @@ export default function Mapa() {
               </div>
 
               {consulta && (
-                <ul className="absolute z-[1000] left-0 right-0 mt-1 bg-blanco-bg border border-[#ddd] rounded-lg shadow-lg max-h-64 overflow-y-auto list-none p-0 m-0">
+                <ul className="absolute z-40 left-0 right-0 mt-1 bg-blanco-bg border border-[#ddd] rounded-lg shadow-lg max-h-64 overflow-y-auto list-none p-0 m-0">
                   {resultados.length === 0 ? (
                     <li className="px-3 py-2 text-sm text-negro-txt/60">
                       No encontramos ese lugar en el campus
@@ -149,7 +149,7 @@ export default function Mapa() {
           <div className="flex-1 min-h-0 flex flex-col md:flex-row gap-4">
 
             {/* Mapa: llena el espacio libre; la leyenda va encima, en la esquina */}
-            <section className="relative h-[60vh] md:h-auto md:flex-1 min-h-80 rounded-xl overflow-hidden border border-gray-200">
+            <section className="relative isolate h-[60vh] md:h-auto md:flex-1 min-h-80 rounded-xl overflow-hidden border border-gray-200">
               <MapInfo onMarkerSelect={setSelectedPoiElegido} focusPoi={focusPoi} puntos={puntos} />
 
               {/* ── Leyenda de colores de los pines (HU-35) ─────────────── */}
