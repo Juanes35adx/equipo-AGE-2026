@@ -72,74 +72,91 @@ export default function Mapa() {
 
   return (
     <div>
+      {/* En computador, encabezado + contenido ocupan exactamente la ventana: el mapa,
+          la leyenda y el panel de información se ven completos sin hacer scroll.
+          El pie de página queda debajo y solo aparece si el usuario baja. */}
+      <div className="flex flex-col md:h-dvh">
         <Header />
-        <main style={styles.container} className='relative min-w-9/10'>
-          <button onClick={() => navigate("/dashboard")} style={styles.back}>← Volver</button>
-          <h1 style={styles.title} className="text-negro-txt">Mapa del Campus UPB</h1>
+        <main className="flex-1 min-h-0 flex flex-col gap-3 w-full max-w-7xl mx-auto px-4 md:px-8 py-4">
 
-          {/* ── Buscar un lugar dentro del mapa ──────────────────────────── */}
-          <div className="relative mb-4 max-w-md">
-            <div className="flex items-center gap-2">
-              <input
-                type="text"
-                value={consulta}
-                onChange={(e) => setConsulta(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && resultados.length > 0) irAlLugar(resultados[0]);
-                }}
-                placeholder="Buscar un lugar del campus..."
-                aria-label="Buscar un lugar dentro del mapa"
-                role="searchbox"
-                className="flex-1 border border-[#ddd] rounded-lg py-2 px-3 text-sm text-negro-txt focus:outline-none focus:ring-2 focus:ring-[#e3001b]/40"
-              />
-              {consulta && (
-                <button
-                  onClick={() => setConsulta("")}
-                  aria-label="Limpiar búsqueda"
-                  className="w-8 h-8 rounded-full bg-gris-bg2 text-negro-txt font-bold cursor-pointer border-none"
-                >
-                  X
-                </button>
-              )}
+          {/* ── Título + buscador en una sola franja ───────────────────── */}
+          <div className="flex flex-col md:flex-row md:items-center gap-3 shrink-0">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => navigate("/dashboard")}
+                className="bg-transparent border-none cursor-pointer text-sm text-negro-txt/60 hover:text-negro-txt"
+              >
+                ← Volver
+              </button>
+              <h1 className="m-0 text-xl md:text-2xl font-medium text-negro-txt">Mapa del Campus UPB</h1>
             </div>
 
-            {consulta && (
-              <ul className="absolute z-20 left-0 right-0 mt-1 bg-blanco-bg border border-[#ddd] rounded-lg shadow-lg max-h-64 overflow-y-auto list-none p-0 m-0">
-                {resultados.length === 0 ? (
-                  <li className="px-3 py-2 text-sm text-negro-txt/60">
-                    No encontramos ese lugar en el campus
-                  </li>
-                ) : (
-                  resultados.map((p) => (
-                    <li key={p.id}>
-                      <button
-                        onClick={() => irAlLugar(p)}
-                        className="w-full text-left px-3 py-2 text-sm text-negro-txt bg-transparent border-none cursor-pointer hover:bg-gris-bg2"
-                      >
-                        <span className="mr-2">{p.icon ?? "📍"}</span>
-                        {p.name}
-                      </button>
-                    </li>
-                  ))
+            {/* ── Buscar un lugar dentro del mapa ──────────────────────── */}
+            <div className="relative w-full md:w-96 md:ml-auto">
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={consulta}
+                  onChange={(e) => setConsulta(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && resultados.length > 0) irAlLugar(resultados[0]);
+                  }}
+                  placeholder="Buscar un lugar del campus..."
+                  aria-label="Buscar un lugar dentro del mapa"
+                  role="searchbox"
+                  className="flex-1 border border-[#ddd] rounded-lg py-2 px-3 text-sm text-negro-txt focus:outline-none focus:ring-2 focus:ring-[#e3001b]/40"
+                />
+                {consulta && (
+                  <button
+                    onClick={() => setConsulta("")}
+                    aria-label="Limpiar búsqueda"
+                    className="w-8 h-8 rounded-full bg-gris-bg2 text-negro-txt font-bold cursor-pointer border-none"
+                  >
+                    X
+                  </button>
                 )}
-              </ul>
-            )}
+              </div>
+
+              {consulta && (
+                <ul className="absolute z-[1000] left-0 right-0 mt-1 bg-blanco-bg border border-[#ddd] rounded-lg shadow-lg max-h-64 overflow-y-auto list-none p-0 m-0">
+                  {resultados.length === 0 ? (
+                    <li className="px-3 py-2 text-sm text-negro-txt/60">
+                      No encontramos ese lugar en el campus
+                    </li>
+                  ) : (
+                    resultados.map((p) => (
+                      <li key={p.id}>
+                        <button
+                          onClick={() => irAlLugar(p)}
+                          className="w-full text-left px-3 py-2 text-sm text-negro-txt bg-transparent border-none cursor-pointer hover:bg-gris-bg2"
+                        >
+                          <span className="mr-2">{p.icon ?? "📍"}</span>
+                          {p.name}
+                        </button>
+                      </li>
+                    ))
+                  )}
+                </ul>
+              )}
+            </div>
           </div>
 
           {errorCarga && (
-            <p className="text-sm text-[#e3001b] mb-4">No se pudieron cargar las ubicaciones: {errorCarga}</p>
+            <p className="text-sm text-[#e3001b] m-0 shrink-0">No se pudieron cargar las ubicaciones: {errorCarga}</p>
           )}
 
-          <div className="flex flex-col md:flex-row w-full">
+          {/* ── Mapa + panel de información ──────────────────────────── */}
+          <div className="flex-1 min-h-0 flex flex-col md:flex-row gap-4">
 
-            {/* ── Map panel ─────────────────────────────────────────────────── */}
-            <div className="w-full md:flex-1">
-              <div className="h-120 md:h-209">
-                <MapInfo onMarkerSelect={setSelectedPoiElegido} focusPoi={focusPoi} puntos={puntos} />
-              </div>
+            {/* Mapa: llena el espacio libre; la leyenda va encima, en la esquina */}
+            <section className="relative h-[60vh] md:h-auto md:flex-1 min-h-80 rounded-xl overflow-hidden border border-gray-200">
+              <MapInfo onMarkerSelect={setSelectedPoiElegido} focusPoi={focusPoi} puntos={puntos} />
 
-              {/* ── Leyenda de colores de los pines ───────────────────────── */}
-              <div className="mt-3 flex flex-wrap gap-4 text-xs text-negro-txt">
+              {/* ── Leyenda de colores de los pines (HU-35) ─────────────── */}
+              <div
+                aria-label="Leyenda del mapa"
+                className="absolute top-3 right-3 z-[500] flex flex-col gap-1 px-3 py-2 rounded-lg shadow-md bg-blanco-bg/95 text-xs text-negro-txt"
+              >
                 {PIN_LEYENDA.map((l) => (
                   <span key={l.tipo} className="flex items-center gap-2">
                     <span
@@ -151,10 +168,10 @@ export default function Mapa() {
                   </span>
                 ))}
               </div>
-            </div>
+            </section>
 
-            {/* ── Info panel ────────────────────────────────────────────────── */}
-            <aside className="w-full md:w-72 h-auto md:h-209 p-6 border-t md:border-t-0 md:border-l border-gray-200 ml-20 overflow-y-auto">
+            {/* ── Panel de información (se desplaza por dentro si el texto es largo) ── */}
+            <aside className="w-full md:w-80 shrink-0 md:overflow-y-auto p-5 rounded-xl border border-gray-200">
               {selectedPoi ? (
                 <>
                   <h2 className="text-lg text-negro-txt mb-2 font-bold">{selectedPoi.name}</h2>
@@ -205,20 +222,14 @@ export default function Mapa() {
                   )}
                 </>
               ) : (
-                <p className="text-sm text-negro-txt">Selecciona un marcador para conocer los detalles</p>
+                <p className="text-sm text-negro-txt m-0">Selecciona un marcador para conocer los detalles</p>
               )}
             </aside>
 
           </div>
         </main>
-        <Footer />
+      </div>
+      <Footer />
     </div>
   );
 }
-
-const styles = {
-  container: { padding: "2rem", maxWidth: "900px", margin: "0 auto" },
-  back: { background: "none", border: "none", cursor: "pointer", fontSize: "14px", color: "#555", marginBottom: "1rem" },
-  title: { fontSize: "1.8rem", fontWeight: 500, marginBottom: "1.5rem" },
-  mapWrapper: { borderRadius: "12px", overflow: "hidden", border: "1px solid #e0e0e0" },
-};

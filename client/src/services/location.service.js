@@ -49,6 +49,30 @@ function distanciaMetros(a, b) {
   return 2 * R * Math.asin(Math.sqrt(x));
 }
 
+/** true si el error es un permiso denegado (ahí no tiene sentido reintentar). */
+function esPermisoDenegado(err) {
+  const t = String(err?.message ?? err ?? "").toLowerCase();
+  return err?.code === 1 || t.includes("denied") || t.includes("permission");
+}
+
+/**
+ * Pide la posición actual. Primero con alta precisión (GPS en celular); si no
+ * responde a tiempo — lo normal en un computador, que se ubica por WiFi —,
+ * reintenta en modo normal y acepta una lectura de hasta un minuto de antigüedad.
+ */
+async function leerPosicion() {
+  try {
+    return await Geolocation.getCurrentPosition({ enableHighAccuracy: true, timeout: 10_000 });
+  } catch (err) {
+    if (esPermisoDenegado(err)) throw err;
+    return Geolocation.getCurrentPosition({
+      enableHighAccuracy: false,
+      timeout: 20_000,
+      maximumAge: 60_000,
+    });
+  }
+}
+
 /**
  * getUserLocation (HU-08, primer fix) — agnóstico al mapa.
  * Lee la posición vía Capacitor Geolocation (en web delega en el navegador)
@@ -75,10 +99,7 @@ export async function getUserLocation(onSuccess, onError) {
       return null;
     }
 
-    const position = await Geolocation.getCurrentPosition({
-      enableHighAccuracy: true,
-      timeout: 10_000,
-    });
+    const position = await leerPosicion();
 
     const userPos = {
       lat: position.coords.latitude,
@@ -97,8 +118,10 @@ export async function getUserLocation(onSuccess, onError) {
 
 /**
  * watchUserLocation (HU-08, tiempo real) — agnóstico al mapa.
- * Emite cada fix vía onUpdate; filtra lecturas imprecisas (accuracy > 100m)
- * y saltos menores a 5m para no hacer temblar el pin.
+ * Emite cada fix vía onUpdate. Solo descarta lecturas que no aportan nada:
+ * movimientos de menos de 5 m sin mejora de precisión, para no hacer temblar el pin.
+ * No descarta lecturas imprecisas: en un computador la ubicación sale del WiFi y
+ * suele tener más de 100 m de margen; el mapa la muestra como "aproximada".
  *
  * @param {object} [opts]
  * @param {Function} [opts.onUpdate] - callback({lat,lng,accuracy})
@@ -127,18 +150,26 @@ export async function watchUserLocation(opts = {}) {
   let watchId = null;
 
   const emitir = (lat, lng, accuracy) => {
-    if (accuracy != null && accuracy > 100) return;
     const next = { lat, lng, accuracy };
-    if (last && distanciaMetros(last, next) < 5) return;
+    if (last) {
+      const casiQuieto = distanciaMetros(last, next) < 5;
+      const mejoroPrecision = accuracy != null && last.accuracy != null && accuracy < last.accuracy - 10;
+      if (casiQuieto && !mejoroPrecision) return;
+    }
     last = next;
     onUpdate?.(next);
   };
 
   try {
     watchId = await Geolocation.watchPosition(
-      { enableHighAccuracy: true, timeout: 10_000, maximumAge: 5000 },
+      // Tope amplio por lectura (60 s): en un computador las actualizaciones llegan
+      // muy espaciadas y un timeout corto solo produciría errores falsos.
+      { enableHighAccuracy: true, timeout: 60_000, maximumAge: 5000 },
       (position, err) => {
         if (err) {
+          // Un timeout en medio del seguimiento no es grave: la siguiente lectura llegará.
+          const t = String(err?.message ?? err).toLowerCase();
+          if (err?.code === 3 || t.includes("timeout") || t.includes("timed out")) return;
           console.warn("FacilityMap: watch error -", err?.message ?? err);
           onError?.(traducirErrorUbicacion(err));
           return;
