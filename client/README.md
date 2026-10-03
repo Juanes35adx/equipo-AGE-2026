@@ -291,7 +291,7 @@ Los smoke tests existentes (`npm test`, con `TEST_EMAIL` / `TEST_PASSWORD` en `c
 
 | HU | Ruta(s) | Pages / componentes | Servicio / dato |
 |---|---|---|---|
-| HU-08 Ubicación en tiempo real | `/mapa` | `pages/Mapa.jsx`, `organisms/MapInfo.jsx` (botón de ubicación, punto azul, círculo de precisión, mensaje de permiso denegado), `atoms/Marker.jsx` (`htmlDeUsuario`) | `location.service.js` (`getUserLocation`, `watchUserLocation`, `traducirErrorUbicacion`), `@capacitor/geolocation` |
+| HU-08 Ubicación en tiempo real | `/mapa` | `pages/Mapa.jsx`, `organisms/MapInfo.jsx` (botón de ubicación, punto azul, círculo de precisión, seguimiento, aviso con causa y pasos), `atoms/Marker.jsx` (`htmlDeUsuario`) | `location.service.js` (`getUserLocation`, `watchUserLocation`, `diagnosticarErrorUbicacion`), `@capacitor/geolocation` |
 | HU-09 Puntos de interés | `/mapa` | `organisms/MapInfo.jsx` (pines con `L.divIcon`), `pages/Mapa.jsx` (panel lateral de detalle), `atoms/Marker.jsx` (`htmlDePin`) | `ubicaciones.service.js` (`getUbicaciones`, `aPunto`), tabla `ubicaciones` |
 | HU-30 Bloques cercanos | `/mapa` | `pages/Mapa.jsx` (sección "Bloques Cercanos" del panel lateral) | `mapa.service.js` (`bloquesCercanos`, `distanciaEnMetros`) |
 | HU-35 Leyenda de colores | `/mapa` | `pages/Mapa.jsx` (leyenda sobre el mapa, esquina superior derecha), `atoms/Marker.jsx` (`PIN_COLORS`) | `mapa.service.js` (`PIN_LEYENDA`) |
@@ -299,7 +299,7 @@ Los smoke tests existentes (`npm test`, con `TEST_EMAIL` / `TEST_PASSWORD` en `c
 | HU-27 Consultar mi perfil | `/perfil` | `pages/Perfil.jsx`, `atoms/Button.jsx` | `profile.service.js` (`getProfile`), `auth.service.js` (`logout`), tabla `profiles` |
 | HU-28 Accesibilidad | todas (por página) | `atoms/AccessButton.jsx`, `atoms/AccessOpts.jsx`, `atoms/SizeButton.jsx`, `atoms/ContrastButton.jsx`, usados en `organisms/Header2.jsx` e `organisms/IniHeader.jsx` | `localStorage` (`font-scale`, `contrast-mode`) |
 
-> **Detalles técnicos del mapa:** las imágenes de OpenStreetMap llegan hasta el nivel de zoom 19; por eso la capa usa `maxNativeZoom: 19` con `maxZoom: 20` (en el 20 se amplían las del 19; sin esto el mapa quedaba en blanco). Un `ResizeObserver` llama a `invalidateSize()` cuando cambia el tamaño del contenedor. La ubicación del usuario se considera "dentro del campus" si cae en los límites del mapa más un margen de ~150 m.
+> **Detalles técnicos del mapa:** las imágenes de OpenStreetMap llegan hasta el nivel de zoom 19; por eso la capa usa `maxNativeZoom: 19` con `maxZoom: 20` (en el 20 se amplían las del 19; sin esto el mapa quedaba en blanco). Un `ResizeObserver` llama a `invalidateSize()` cuando cambia el tamaño del contenedor. El mapa va dentro de un contenedor con `isolate`: las capas de Leaflet usan `z-index` de 200 a 1000 y, sin un contexto propio, al hacer scroll se montaban encima del encabezado fijo (`z-50`). `diagnosticarErrorUbicacion()` combina el código del error (1 permiso, 2 no disponible, 3 tiempo agotado), `navigator.permissions.query` y `window.isSecureContext` para explicar la causa real. La ubicación del usuario se considera "dentro del campus" si cae en los límites del mapa más un margen de ~150 m.
 
 > **Pantallas conectadas al mapa:** desde Actividades se puede abrir el mapa centrado en el lugar de un evento; `pages/Mapa.jsx` lo recibe como `location.state.ubicacionId`.
 

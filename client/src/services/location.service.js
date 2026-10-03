@@ -18,23 +18,149 @@ async function ensureLocationPermission() {
   return requested.location === "granted" || requested.coarseLocation === "granted";
 }
 
+/** Sistema operativo del computador, para dar la ruta correcta de configuración. */
+function sistemaDelEquipo() {
+  const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
+  if (/Windows/i.test(ua)) return "windows";
+  if (/Mac OS X|Macintosh/i.test(ua)) return "mac";
+  return "otro";
+}
+
+/** Estado del permiso de ubicación en el navegador: "granted", "denied", "prompt" o null. */
+async function estadoPermisoNavegador() {
+  try {
+    const p = await navigator.permissions?.query({ name: "geolocation" });
+    return p?.state ?? null;
+  } catch {
+    return null;
+  }
+}
+
 /**
- * Traduce errores técnicos (geolocalización) a un mensaje claro en español
- * para el banner. El detalle técnico queda en consola.
+ * Explica por qué no se pudo obtener la ubicación y qué tiene que hacer el usuario.
+ * El navegador devuelve un código (1 permiso, 2 no disponible, 3 tiempo agotado); con
+ * ese código, el estado del permiso y el tipo de dirección se distingue la causa real.
+ *
+ * @param {object|string} err Error del navegador o de Capacitor.
+ * @returns {Promise<{titulo: string, pasos: string[], detalle: string}>}
  */
-export function traducirErrorUbicacion(err) {
-  const crudo = err?.message ?? String(err ?? "");
-  const t = crudo.toLowerCase();
-  if (t.includes("denied") || t.includes("denegado") || t.includes("permission") || t.includes("permiso")) {
-    return "Permiso de ubicación denegado. Puedes seguir usando el mapa sin tu posición.";
+export async function diagnosticarErrorUbicacion(err) {
+  const mensaje = String(err?.message ?? err ?? "");
+  const t = mensaje.toLowerCase();
+  const codigo = err?.code;
+  const detalle = `${codigo != null ? `código ${codigo}: ` : ""}${mensaje || "sin mensaje"}`;
+  const esPermiso = codigo === 1 || t.includes("denied") || t.includes("permission");
+
+  // ── App de Android (Capacitor) ──────────────────────────────────────
+  if (Capacitor.isNativePlatform()) {
+    if (t.includes("location services") || t.includes("not enabled") || t.includes("disabled")) {
+      return {
+        titulo: "La ubicación del celular está apagada",
+        pasos: ["Activa la ubicación (GPS) desde el panel rápido del celular.", "Vuelve a AGE y pulsa Reintentar."],
+        detalle,
+      };
+    }
+    if (esPermiso) {
+      return {
+        titulo: "AGE no tiene permiso para usar tu ubicación",
+        pasos: [
+          "Abre Ajustes → Aplicaciones → AGE → Permisos → Ubicación.",
+          "Elige \"Permitir solo con la app en uso\".",
+          "Vuelve a AGE y pulsa Reintentar.",
+        ],
+        detalle,
+      };
+    }
   }
-  if (t.includes("timeout") || t.includes("timed out") || t.includes("tiempo")) {
-    return "Tardó demasiado en obtener tu ubicación. Inténtalo de nuevo cerca de una ventana o con el GPS activado.";
+
+  // ── Navegador ───────────────────────────────────────────────────────
+  if (typeof window !== "undefined" && !window.isSecureContext) {
+    return {
+      titulo: "La ubicación no funciona en esta dirección",
+      pasos: [
+        `Abriste la app desde ${window.location.origin}, que no es una dirección segura, y el navegador bloquea la ubicación ahí.`,
+        "En este computador, ábrela desde http://localhost con el mismo puerto; en otro equipo o celular, usa una dirección https.",
+      ],
+      detalle,
+    };
   }
-  if (t.includes("unavailable") || t.includes("no disponible") || t.includes("position unavailable")) {
-    return "Tu ubicación no está disponible ahora mismo. Puedes seguir usando el mapa sin tu posición.";
+
+  if (typeof navigator !== "undefined" && !navigator.geolocation) {
+    return {
+      titulo: "Este navegador no permite usar la ubicación",
+      pasos: ["Abre AGE en Chrome, Edge o Firefox actualizados."],
+      detalle,
+    };
   }
-  return "No pudimos obtener tu ubicación. Puedes seguir usando el mapa sin tu posición.";
+
+  if (esPermiso) {
+    const estado = await estadoPermisoNavegador();
+    if (estado === "denied") {
+      return {
+        titulo: "El navegador tiene bloqueada la ubicación para este sitio",
+        pasos: [
+          "Haz clic en el ícono que está a la izquierda de la dirección de la página (candado o controles del sitio).",
+          "En \"Ubicación\", elige \"Permitir\".",
+          "Recarga la página y pulsa Reintentar.",
+        ],
+        detalle,
+      };
+    }
+    if (estado === "granted") {
+      const so = sistemaDelEquipo();
+      return {
+        titulo: "El navegador tiene permiso, pero el sistema no le entrega la ubicación",
+        pasos:
+          so === "windows"
+            ? [
+                "Abre Configuración → Privacidad y seguridad → Ubicación.",
+                "Activa \"Servicios de ubicación\" y \"Permitir que las aplicaciones de escritorio accedan a la ubicación\".",
+                "Pulsa Reintentar.",
+              ]
+            : so === "mac"
+              ? ["Abre Ajustes del Sistema → Privacidad y seguridad → Localización.", "Activa la localización para tu navegador.", "Pulsa Reintentar."]
+              : ["Revisa que la ubicación del sistema esté activada y que tu navegador tenga permiso.", "Pulsa Reintentar."],
+        detalle,
+      };
+    }
+    return {
+      titulo: "No se aceptó el permiso de ubicación",
+      pasos: [
+        "Pulsa Reintentar y, en la ventana que abre el navegador, elige \"Permitir\".",
+        "Si la ventana no aparece, haz clic en el ícono a la izquierda de la dirección y permite la ubicación.",
+      ],
+      detalle,
+    };
+  }
+
+  if (codigo === 2 || t.includes("unavailable")) {
+    const so = sistemaDelEquipo();
+    return {
+      titulo: "No se pudo calcular tu ubicación",
+      pasos: [
+        "Revisa que el WiFi esté encendido: un computador calcula su ubicación con las redes WiFi cercanas, aunque no esté conectado a ellas.",
+        so === "windows"
+          ? "Revisa que esté activada en Configuración → Privacidad y seguridad → Ubicación."
+          : "Revisa que la ubicación del sistema esté activada.",
+        "Pulsa Reintentar.",
+      ],
+      detalle,
+    };
+  }
+
+  if (codigo === 3 || t.includes("timeout") || t.includes("timed out")) {
+    return {
+      titulo: "Tardó demasiado en encontrar tu ubicación",
+      pasos: ["Pulsa Reintentar.", "En celular, sal a un lugar abierto o activa la ubicación de alta precisión."],
+      detalle,
+    };
+  }
+
+  return {
+    titulo: "No pudimos obtener tu ubicación",
+    pasos: ["Pulsa Reintentar.", "Si sigue fallando, prueba con otro navegador."],
+    detalle,
+  };
 }
 
 /** Distancia en metros (Haversine) para filtrar fixes insignificantes. */
@@ -79,7 +205,7 @@ async function leerPosicion() {
  * y la devuelve. El componente del mapa decide cómo pintarla (Leaflet).
  *
  * @param {Function} [onSuccess] - callback({ lat, lng, accuracy })
- * @param {Function} [onError]   - callback(mensajeAmable)
+ * @param {Function} [onError]   - callback({ titulo, pasos, detalle }) con la causa y qué hacer
  * @returns {Promise<{lat,lng,accuracy}|null>}
  */
 export async function getUserLocation(onSuccess, onError) {
@@ -93,9 +219,8 @@ export async function getUserLocation(onSuccess, onError) {
   try {
     const allowed = await ensureLocationPermission();
     if (!allowed) {
-      const message = "Permiso de ubicación denegado. Puedes seguir usando el mapa sin tu posición.";
-      console.warn("FacilityMap:", message);
-      onError?.(message);
+      console.warn("FacilityMap: permiso de ubicación negado en el dispositivo");
+      onError?.(await diagnosticarErrorUbicacion({ code: 1, message: "permission denied (dispositivo)" }));
       return null;
     }
 
@@ -111,7 +236,7 @@ export async function getUserLocation(onSuccess, onError) {
     return userPos;
   } catch (err) {
     console.warn("FacilityMap: geolocation error -", err?.message ?? err);
-    onError?.(traducirErrorUbicacion(err));
+    onError?.(await diagnosticarErrorUbicacion(err));
     return null;
   }
 }
@@ -125,7 +250,7 @@ export async function getUserLocation(onSuccess, onError) {
  *
  * @param {object} [opts]
  * @param {Function} [opts.onUpdate] - callback({lat,lng,accuracy})
- * @param {Function} [opts.onError]  - callback(mensajeAmable)
+ * @param {Function} [opts.onError]  - callback({ titulo, pasos, detalle }) con la causa y qué hacer
  * @returns {Promise<Function>} cleanup para detener el watch
  */
 export async function watchUserLocation(opts = {}) {
@@ -141,8 +266,7 @@ export async function watchUserLocation(opts = {}) {
 
   const allowed = await ensureLocationPermission();
   if (!allowed) {
-    const message = "Permiso de ubicación denegado. Puedes seguir usando el mapa sin tu posición.";
-    onError?.(message);
+    onError?.(await diagnosticarErrorUbicacion({ code: 1, message: "permission denied (dispositivo)" }));
     return async () => {};
   }
 
@@ -171,7 +295,7 @@ export async function watchUserLocation(opts = {}) {
           const t = String(err?.message ?? err).toLowerCase();
           if (err?.code === 3 || t.includes("timeout") || t.includes("timed out")) return;
           console.warn("FacilityMap: watch error -", err?.message ?? err);
-          onError?.(traducirErrorUbicacion(err));
+          diagnosticarErrorUbicacion(err).then((d) => onError?.(d));
           return;
         }
         if (!position?.coords) return;
@@ -184,7 +308,7 @@ export async function watchUserLocation(opts = {}) {
     );
   } catch (err) {
     console.warn("FacilityMap: no se pudo iniciar el seguimiento -", err?.message ?? err);
-    onError?.(traducirErrorUbicacion(err));
+    onError?.(await diagnosticarErrorUbicacion(err));
     return async () => {};
   }
 

@@ -316,11 +316,21 @@ export default function MAPMap({ onMarkerSelect, focusPoi, puntos = [] }) {
       {(permiso === "denegado" || permiso === "error") && mensajePermiso && (
         <div
           role="alert"
-          className="absolute top-3 left-3 right-3 z-[500] bg-blanco-bg border border-[#f5c6c2] rounded-lg shadow-lg px-4 py-3 text-sm text-negro-txt"
+          className="absolute top-3 left-3 right-3 md:right-auto md:max-w-md z-[500] max-h-[calc(100%-1.5rem)] overflow-y-auto bg-blanco-bg border border-[#f5c6c2] rounded-lg shadow-lg px-4 py-3 text-sm text-negro-txt"
         >
-          <p className="mb-1">{mensajePermiso}</p>
-          <p className="text-negro-txt/70 mb-2">
-            Puedes seguir usando el mapa, la búsqueda y los bloques cercanos sin tu posición.
+          {/* El servicio devuelve { titulo, pasos, detalle }; un texto suelto se muestra tal cual */}
+          <p className="m-0 font-semibold">
+            {typeof mensajePermiso === "string" ? mensajePermiso : mensajePermiso.titulo}
+          </p>
+          {mensajePermiso.pasos?.length > 0 && (
+            <ol className="mt-2 mb-0 pl-5 space-y-1 list-decimal">
+              {mensajePermiso.pasos.map((paso) => (
+                <li key={paso}>{paso}</li>
+              ))}
+            </ol>
+          )}
+          <p className="mt-2 mb-3 text-negro-txt/60">
+            Mientras tanto, puedes usar el mapa, la búsqueda y los bloques cercanos sin tu posición.
           </p>
           <button
             onClick={solicitarUbicacion}
@@ -328,6 +338,11 @@ export default function MAPMap({ onMarkerSelect, focusPoi, puntos = [] }) {
           >
             Reintentar
           </button>
+          {mensajePermiso.detalle && (
+            <p className="mt-3 mb-0 text-[0.7rem] text-negro-txt/40 break-words">
+              Detalle técnico: {mensajePermiso.detalle}
+            </p>
+          )}
         </div>
       )}
     </div>
