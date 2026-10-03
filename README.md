@@ -279,6 +279,8 @@ Tercer sprint del proyecto. Cubre el mapa interactivo del campus (ubicación en 
 
 **Épicas:** Mapa Interactivo · Inicio · Accesibilidad
 
+> **Pantalla del mapa sin scroll (02/10/2026):** en computador, el título, el buscador, el mapa con su leyenda y el panel de información caben completos en la ventana y el mapa queda fijo. Verificado en 1920×1080, 1440×900 y 1366×768. En celular el mapa ocupa el 60 % de la pantalla y el panel va debajo.
+
 > **Cambio de tecnología del mapa:** el 29 de septiembre de 2026 el mapa migró de Google Maps a **Leaflet + OpenStreetMap**. Ya no necesita API key ni tarjeta de crédito, y la variable `VITE_GOOGLE_API_KEY` dejó de usarse.
 
 ### Historias de usuario del sprint
@@ -303,15 +305,19 @@ Como usuario de AGE, quiero ver mi ubicación en tiempo real sobre el plano del 
 - ✔ Solicitud explícita de permisos de geolocalización: botón "📍 Mostrar mi ubicación"; el permiso no se pide al entrar, solo al pulsarlo
 - ✔ Plano del campus UPB Laureles renderizado con Leaflet + OpenStreetMap, limitado a los bordes del campus
 - ✔ Marcador azul que representa la posición actual del usuario, con un círculo que indica la precisión en metros
-- ✔ La posición se actualiza conforme el usuario se desplaza (seguimiento continuo con `watchPosition`)
+- ✔ La posición se actualiza conforme el usuario se desplaza (seguimiento continuo con `watchPosition`), y el mapa lo acompaña mientras camina. Si el usuario arrastra el mapa o elige un lugar, deja de seguirlo; el botón "Centrar en mí" lo retoma
+- ✔ Funciona en computador: allí la ubicación sale del WiFi y suele tener más de 100 m de margen, así que se muestra como "Ubicación aproximada" en vez de descartarse (antes se descartaba y el punto nunca se actualizaba). Si la alta precisión no responde en 10 s, se reintenta en modo normal
+- ✔ Si el usuario está fuera del campus, el mapa no se mueve: avisa "Estás fuera del campus" con la distancia aproximada, y el punto aparece solo cuando entra
 - ✔ Si se deniega el permiso, muestra un mensaje claro, explica que el mapa, la búsqueda y los bloques cercanos siguen funcionando, y ofrece "Reintentar"
 - ✔ El mapa principal carga en menos de 3 segundos (NF-02): medido el 30/09/2026 en **~1,5 s** hasta el último cuadro visible del mapa
-- ⚠ **Nota honesta:** la medición de NF-02 se hizo en un computador de escritorio con el servidor de desarrollo, no en un celular con datos móviles. El seguimiento en tiempo real está implementado, pero no se ha probado caminando por el campus.
+- ✔ Verificado el 02/10/2026 con pruebas automáticas (Playwright) que simulan la ubicación: punto dentro del campus, caminata de 160 m, precisión de computador (±600 m), fuera del campus y permiso denegado
+- ⚠ **Nota honesta:** las pruebas simulan la ubicación del navegador; no se ha probado caminando por el campus con un celular real ni dentro del APK de Android. En Windows, para que el navegador entregue la ubicación tiene que estar activada en Configuración → Privacidad y seguridad → Ubicación. La medición de NF-02 se hizo en escritorio, no con datos móviles.
 
 #### HU-09 · Puntos de interés en el mapa
 Como usuario de AGE, quiero hacer clic en los puntos de interés del mapa, para poder consultar información corta y una imagen de referencia de cada lugar. Requisito origen: F-03 / RF-2. Puntos de historia: 2. Prioridad: P(0).
 
-- ✔ Marcadores ubicados sobre cada sitio relevante del campus: 35 ubicaciones activas
+- ✔ Marcadores ubicados sobre cada sitio relevante del campus: 35 ubicaciones activas. **Corregido el 02/10/2026:** el pin del Bloque 6 estaba sobre el edificio del Bloque 7, y el del Bloque 7 sobre los restaurantes del bulevar; se reubicaron según los edificios rotulados en OpenStreetMap
+- ✔ Se puede acercar hasta el nivel máximo y mover el mapa sin que desaparezca (antes quedaba en blanco: OpenStreetMap no tiene imágenes en el nivel 20, ahora se amplían las del 19)
 - ✔ Al hacer clic en un marcador se despliega su información en el panel lateral
 - ✔ Los puntos están clasificados por tipo: 22 bloques, 9 de comida y 4 porterías
 - ✔ La información se carga desde la tabla `ubicaciones` de Supabase
@@ -327,7 +333,7 @@ Como usuario de AGE, quiero ver los bloques cercanos sobre el mapa, para poder r
 #### HU-35 · Leyenda de colores del mapa
 Como usuario de AGE, quiero una leyenda que explique el color de cada pin, para poder interpretar el mapa sin tener que adivinar. Origen: Mural, columna "Mapa".
 
-- ✔ Leyenda visible justo debajo del mapa
+- ✔ Leyenda visible sobre el mapa, en la esquina superior derecha
 - ✔ Pin amarillo: bloques y facultades
 - ✔ Pin rojo: comida y cafeterías
 - ✔ Pin negro: porterías y entradas
@@ -361,8 +367,8 @@ Como usuario de AGE, quiero ajustar el tamaño del texto y el contraste, para po
 ### Cómo verificar el Sprint 3 a mano
 
 1. `cd client; npm install; npm run dev`, iniciar sesión y entrar a "Mapa" desde el menú o los accesos rápidos.
-2. El plano del campus carga con pines amarillos, rojos y negros, y la leyenda debajo explica cada color.
-3. Pulsar "📍 Mostrar mi ubicación": el navegador pide permiso. Al aceptarlo aparece el punto azul; al negarlo, sale el mensaje con "Reintentar".
+2. El plano del campus carga con pines amarillos, rojos y negros, y la leyenda en la esquina explica cada color. Todo se ve sin hacer scroll; acercar al máximo y arrastrar no deja el mapa en blanco.
+3. Pulsar "📍 Mostrar mi ubicación": el navegador pide permiso. Al aceptarlo aparece el punto azul ("Ubicación aproximada" si estás en computador, o "Estás fuera del campus" si no estás en la UPB); al negarlo, sale el mensaje con "Reintentar".
 4. Hacer clic en un pin: el panel lateral muestra nombre, foto (si tiene) y descripción, y debajo los 3 bloques más cercanos con su distancia.
 5. Escribir "biblioteca" en el buscador del mapa y elegir el resultado: el mapa se centra y abre su detalle. Buscar "xyz" muestra "No encontramos ese lugar en el campus".
 6. Entrar a "Perfil": se ven nombre, correo, programa, ID y semestre, y los botones "Cerrar Sesión" y "SIGAA".

@@ -294,16 +294,18 @@ Los smoke tests existentes (`npm test`, con `TEST_EMAIL` / `TEST_PASSWORD` en `c
 | HU-08 Ubicación en tiempo real | `/mapa` | `pages/Mapa.jsx`, `organisms/MapInfo.jsx` (botón de ubicación, punto azul, círculo de precisión, mensaje de permiso denegado), `atoms/Marker.jsx` (`htmlDeUsuario`) | `location.service.js` (`getUserLocation`, `watchUserLocation`, `traducirErrorUbicacion`), `@capacitor/geolocation` |
 | HU-09 Puntos de interés | `/mapa` | `organisms/MapInfo.jsx` (pines con `L.divIcon`), `pages/Mapa.jsx` (panel lateral de detalle), `atoms/Marker.jsx` (`htmlDePin`) | `ubicaciones.service.js` (`getUbicaciones`, `aPunto`), tabla `ubicaciones` |
 | HU-30 Bloques cercanos | `/mapa` | `pages/Mapa.jsx` (sección "Bloques Cercanos" del panel lateral) | `mapa.service.js` (`bloquesCercanos`, `distanciaEnMetros`) |
-| HU-35 Leyenda de colores | `/mapa` | `pages/Mapa.jsx` (leyenda bajo el mapa), `atoms/Marker.jsx` (`PIN_COLORS`) | `mapa.service.js` (`PIN_LEYENDA`) |
+| HU-35 Leyenda de colores | `/mapa` | `pages/Mapa.jsx` (leyenda sobre el mapa, esquina superior derecha), `atoms/Marker.jsx` (`PIN_COLORS`) | `mapa.service.js` (`PIN_LEYENDA`) |
 | HU-36 Buscar en el mapa | `/mapa` | `pages/Mapa.jsx` (buscador, lista de resultados, `irAlLugar`), `organisms/MapInfo.jsx` (`flyTo` al lugar elegido) | `ubicaciones.service.js` |
 | HU-27 Consultar mi perfil | `/perfil` | `pages/Perfil.jsx`, `atoms/Button.jsx` | `profile.service.js` (`getProfile`), `auth.service.js` (`logout`), tabla `profiles` |
 | HU-28 Accesibilidad | todas (por página) | `atoms/AccessButton.jsx`, `atoms/AccessOpts.jsx`, `atoms/SizeButton.jsx`, `atoms/ContrastButton.jsx`, usados en `organisms/Header2.jsx` e `organisms/IniHeader.jsx` | `localStorage` (`font-scale`, `contrast-mode`) |
+
+> **Detalles técnicos del mapa:** las imágenes de OpenStreetMap llegan hasta el nivel de zoom 19; por eso la capa usa `maxNativeZoom: 19` con `maxZoom: 20` (en el 20 se amplían las del 19; sin esto el mapa quedaba en blanco). Un `ResizeObserver` llama a `invalidateSize()` cuando cambia el tamaño del contenedor. La ubicación del usuario se considera "dentro del campus" si cae en los límites del mapa más un margen de ~150 m.
 
 > **Pantallas conectadas al mapa:** desde Actividades se puede abrir el mapa centrado en el lugar de un evento; `pages/Mapa.jsx` lo recibe como `location.state.ubicacionId`.
 
 ### Brechas conocidas del Sprint 3 ⚠️
 
-1. **HU-08:** el tiempo de carga (NF-02, ~1,5 s) se midió en escritorio con el servidor de desarrollo, no en un celular con datos móviles. El seguimiento en tiempo real (`watchPosition`) no se ha probado caminando por el campus.
+1. **HU-08:** el tiempo de carga (NF-02, ~1,5 s) se midió en escritorio con el servidor de desarrollo, no en un celular con datos móviles. El seguimiento en tiempo real (`watchPosition`) se verificó con Playwright simulando la ubicación (caminata, precisión de computador, fuera del campus, permiso denegado), pero no caminando por el campus con un celular real ni dentro del APK. En Windows, el navegador solo entrega la ubicación si está activada en Configuración → Privacidad y seguridad → Ubicación.
 2. **HU-09:** de las 35 ubicaciones, 15 no tienen `imagen_url`: los 9 puntos de comida, las 4 porterías, `poi-013` (Bulevar Bloque 12) y `poi-017a` (Gimnasio UPB).
 3. **HU-30:** los bloques cercanos se calculan respecto al lugar **elegido** (los 3 más cercanos), no respecto a la zona visible del mapa, y se muestran en el panel lateral, no encima del mapa.
 4. **HU-27:** el "ID" son los primeros 8 caracteres de `profiles.profile_id` (UUID de Supabase Auth), no el ID de estudiante de la UPB, que no existe en la base. Las notificaciones son un texto fijo; no hay tabla ni lógica de notificaciones.
