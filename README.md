@@ -373,3 +373,98 @@ Como usuario de AGE, quiero ajustar el tamaño del texto y el contraste, para po
 5. Escribir "biblioteca" en el buscador del mapa y elegir el resultado: el mapa se centra y abre su detalle. Buscar "xyz" muestra "No encontramos ese lugar en el campus".
 6. Entrar a "Perfil": se ven nombre, correo, programa, ID y semestre, y los botones "Cerrar Sesión" y "SIGAA".
 7. Pulsar el icono de accesibilidad del encabezado: "A+" y "A-" cambian el tamaño del texto y 🌓 alterna el contraste. Recargar la página y comprobar que el ajuste se mantiene.
+
+---
+
+## Sprint 4 — Búsqueda y Actividades (avance)
+
+Cuarto sprint del proyecto, **todavía en curso**. Cubre la sección de búsqueda (palabras clave, búsqueda sin resultados y filtro por etiquetas) y las actividades de la universidad (ver, inscribirse y cancelar). Esta sección documenta **el avance al 14 de octubre de 2026**: qué ya funciona y qué falta. Todo lo de aquí describe **únicamente el Sprint 4**; el resto del documento no cambia.
+
+**Épicas:** Búsqueda y Etiquetas · Eventos y Actividades
+
+### Historias de usuario del sprint
+
+| HU | Historia | Épica | Estado al 14/10/2026 |
+|---|---|---|---|
+| HU-10 | Barra de búsqueda por palabras clave | Búsqueda y Etiquetas | ⏳ Avanzada: 4 de 5 criterios (falta tolerar tildes) |
+| HU-11 | Búsqueda sin resultados | Búsqueda y Etiquetas | ⏳ Avanzada: 2 de 4 criterios |
+| HU-12 | Filtro por sistema de etiquetas | Búsqueda y Etiquetas | ⏳ Avanzada: 3 de 5 criterios |
+| HU-24 | Ver actividades disponibles | Eventos y Actividades | ✔ Cumplida, con notas (ver detalle) |
+| HU-25 | Inscribirme a una actividad | Eventos y Actividades | ✔ Cumplida, con notas (ver detalle) |
+| HU-26 | Cancelar mi inscripción | Eventos y Actividades | ✔ Cumplida, con notas (ver detalle) |
+
+✔ = cumple los criterios · ⏳ = en desarrollo, parte de los criterios ya funciona · ❌ = criterio pendiente
+
+### Detalle por historia
+
+#### HU-10 · Barra de búsqueda por palabras clave
+Como usuario de AGE, necesito una barra de búsqueda por palabras clave, para poder encontrar rápidamente un lugar o sección específica sin recorrer el mapa manualmente. Requisito origen: F-14.1. Puntos de historia: 1. Prioridad: P(3).
+
+- ✔ Barra de búsqueda accesible desde la sección "Buscar" (menú lateral y acceso rápido del inicio)
+- ✔ Devuelve contenido relacionado con el término: busca en el título, la descripción y las etiquetas de las 8 secciones de `searchIndex.json`, y filtra mientras se escribe
+- ✔ Cada resultado enlaza a la sección de la app correspondiente; no busca lugares del campus (eso lo hace el buscador del mapa, HU-36)
+- ✔ La búsqueda responde en menos de 2 segundos (NF-02): filtra en el navegador, sin consultar la base, y el resultado aparece al instante
+- ❌ Tolera mayúsculas, pero **no tildes**: "programación" encuentra Actividades y "programacion" no encuentra nada
+- **Pendientes encontrados:** pulsar Enter o la flecha produce un error en la consola ("Invalid hook call"), porque `Buscar.jsx` le pasa el propio componente como función de búsqueda; no se nota en pantalla porque la búsqueda ya es instantánea. Además, "Profesores" sigue apareciendo como resultado aunque se sacó del menú.
+
+#### HU-11 · Búsqueda sin resultados
+Como usuario de AGE, quiero que se me ofrezca usar filtros cuando mi búsqueda no arroja resultados, para poder encontrar lo que necesito por otra vía. Requisito origen: F-14.1. Puntos de historia: 1. Prioridad: P(3).
+
+- ✔ Mensaje claro cuando la consulta no arroja resultados: "No encontramos resultados para …", con la sugerencia de probar otras palabras
+- ✔ El botón de filtrar (+) sigue disponible aunque la búsqueda no arroje resultados
+- ❌ Al presionarlo **no** regresa al inicio de la búsqueda: abre la lista de etiquetas, pero el texto que no dio resultados se queda escrito
+- ❌ El mensaje no ofrece las etiquetas como alternativa de navegación; solo sugiere cambiar las palabras
+
+#### HU-12 · Filtro por sistema de etiquetas
+Como usuario de AGE, necesito filtrar el contenido por etiquetas, para poder llegar directo a las secciones que me interesan sin escribir una búsqueda libre. Requisito origen: F-14.2. Puntos de historia: 5. Prioridad: P(0).
+
+- ✔ Botón de filtrar (+) visible en la sección "Buscar"
+- ✔ Catálogo con las 22 etiquetas disponibles, en una sola lista (`tagList.json`)
+- ✔ Al seleccionar una etiqueta se buscan automáticamente las secciones marcadas (por ejemplo, "ayuda" muestra 3 secciones)
+- ❌ Combinar dos etiquetas da 0 resultados en vez de combinarlas: la segunda se agrega al texto ("ayuda mapa") y se busca la frase completa, que ninguna sección contiene
+- ❌ Las etiquetas activas no se muestran aparte ni se pueden quitar una por una: quedan como texto dentro del buscador y la X borra todo
+- **Pendiente encontrado:** 4 de las 22 etiquetas (comida, descanso, parqueadero y auditorio) no corresponden a ninguna sección, así que al elegirlas nunca hay resultados
+
+#### HU-24 · Ver actividades disponibles
+Como usuario de AGE, quiero ver las actividades disponibles de la universidad, para poder decidir en cuáles participar. Origen: Mural, columna "Actividades".
+
+- ✔ Listado de las actividades, cargado desde la vista `eventos_con_cupo` de la base (hoy hay 5)
+- ✔ Cada actividad muestra lugar, fecha y cupos disponibles
+- ✔ Enlace "¿No sabes cómo llegar?" que lleva al mapa
+- ✔ Al llegar desde una actividad, el mapa abre ese punto ya seleccionado y centrado
+- ✔ La tarjeta muestra la insignia "Ya estás inscrito" cuando el usuario participa
+- ✔ La tarjeta indica "Cupo lleno" o "Cupo ilimitado" según corresponda
+- ⚠ **Nota honesta:** las 5 actividades de la base son del 5 al 15 de septiembre de 2026, así que hoy todas ya pasaron. La página no filtra por fecha: las sigue mostrando como "Disponibles" y deja inscribirse. Hace falta cargar actividades nuevas o filtrar las vencidas.
+
+#### HU-25 · Inscribirme a una actividad
+Como usuario de AGE, quiero ver los cupos e inscribirme a una actividad, para poder asegurar mi lugar. Origen: Mural, columna "Actividad desplegado".
+
+- ✔ El modal muestra título, lugar, fecha y descripción de la actividad
+- ✔ Botón "Participar" dentro del modal
+- ✔ Tras inscribirse queda registrado en la tabla `inscripciones_evento` (una sola vez por usuario y actividad)
+- ✔ No permite inscribirse si ya no hay cupos: el botón se reemplaza por "Este evento ya alcanzó su cupo máximo"
+- ✔ Al inscribirse, el modal sigue abierto y pasa a mostrar "Cancelar inscripción"
+- ⚠ **Nota honesta:** el mensaje de confirmación existe ("Te inscribiste a …"), pero se pinta en la página, detrás del modal, así que queda tapado mientras el modal sigue abierto; se ve al cerrarlo. Además, el límite de cupos solo lo controla la pantalla: la política de la base solo exige que cada persona se inscriba a sí misma, así que una inscripción hecha directo contra la API, o dos al mismo tiempo, pueden pasarse del cupo.
+
+#### HU-26 · Cancelar mi inscripción
+Como usuario de AGE, quiero cancelar mi inscripción a una actividad, para poder liberar el cupo si ya no puedo asistir. Origen: Mural, columna "Actividad desplegado".
+
+- ✔ Opción "Cancelar inscripción" cuando el usuario ya está inscrito (botón blanco con borde, para no competir con "Participar")
+- ✔ Al cancelar, el cupo vuelve a quedar disponible (la vista cuenta los inscritos en cada consulta)
+- ✔ La actividad deja de figurar como inscrita para ese usuario
+- ✔ Al cancelar, el modal sigue abierto y vuelve a mostrar "Participar"
+- ⚠ **Nota honesta:** igual que en HU-25, el mensaje "Cancelaste tu inscripción a …" queda detrás del modal mientras está abierto.
+
+### Cómo se verificó este avance
+
+- **Búsqueda (HU-10, 11 y 12):** probada en el navegador el 14/10/2026 con Playwright: búsqueda con mayúsculas y con tildes, término sin resultados, botón +, una etiqueta, dos etiquetas combinadas y las teclas Enter y flecha. Las etiquetas sin resultados se calcularon contra `searchIndex.json`.
+- **Actividades (HU-24, 25 y 26):** revisadas contra el código (`Actividades.jsx`, `eventos.service.js`) y la base de datos (vista `eventos_con_cupo`, restricciones y políticas de `inscripciones_evento`). No se probó el flujo de inscripción en el navegador porque requiere iniciar sesión.
+
+### Cómo verificar el Sprint 4 a mano
+
+1. `cd client; npm install; npm run dev`, iniciar sesión y entrar a "Buscar" desde el menú o los accesos rápidos.
+2. Escribir "mapa" o "MAPA": aparece la sección Mapa. Escribir "programacion" sin tilde: no aparece nada (pendiente).
+3. Escribir "xyz": sale "No encontramos resultados…" y el botón + sigue visible.
+4. Pulsar + y elegir "ayuda": aparecen 3 secciones. Pulsar + otra vez y elegir "mapa": salen 0 resultados (pendiente).
+5. Entrar a "Actividades": cada tarjeta muestra lugar, fecha, cupos y "¿No sabes cómo llegar?", que abre el mapa en el lugar del evento.
+6. Abrir "Mas Información" y pulsar "Participar": el botón pasa a "Cancelar inscripción"; al cerrar el modal se ve el mensaje y la insignia "Ya estás inscrito". Volver a abrirlo y cancelar.
