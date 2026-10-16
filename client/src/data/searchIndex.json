@@ -3,7 +3,7 @@
     "title": "Preguntas Frecuentes",
     "path": "/faqs",
     "description": "Encuentra respuestas a las dudas más comunes entre primiparos y no primiparos.",
-    "tags": ["faq", "ayuda", "preguntas"]
+    "tags": ["faq", "ayuda", "preguntas", "academico"]
   },
   {
     "title": "Actividades",
@@ -27,7 +27,7 @@
     "title": "Mapa",
     "path": "/mapa",
     "description": "Visualiza la ubicación de los puntos de interés y bloques de la u.",
-    "tags": ["ubicacion", "lugares", "mapa"]
+    "tags": ["ubicacion", "lugares", "mapa", "comida", "descanso", "parqueadero", "auditorio"]
   },
   {
     "title": "Foro",
@@ -39,12 +39,6 @@
     "title": "Mentores",
     "path": "/mentores",
     "description": "Recibe tutorías y ayuda en trabajos por parte de mentores especializados. ",
-    "tags": ["ayuda", "tutoria", "contactar"]
-  },
-  {
-    "title": "Profesores",
-    "path": "/profesores",
-    "description": "Donde encontrar y contactar a los profesores.",
-    "tags": ["academico", "contactar"]
+    "tags": ["ayuda", "tutoria", "contactar", "academico"]
   }
 ]

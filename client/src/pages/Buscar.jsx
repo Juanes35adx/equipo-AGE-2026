@@ -4,33 +4,51 @@ import searchData from '../data/searchIndex.json';
 import Header from '../components/organisms/Header2'
 import Footer from '../components/organisms/Footer'
 import SearchBar from '../components/organisms/Search';
+import tagList from '../data/tagList.json';
+import { buscarSecciones, etiquetasCompatibles } from '../services/busqueda.service';
+
+// Etiquetas que se sugieren cuando una búsqueda no encuentra nada (HU-11).
+const ETIQUETAS_SUGERIDAS = ['ayuda', 'mapa', 'eventos', 'preguntas', 'tutoria', 'comida'];
 
 /** Buscar
-    * By making use of Javascript's filter and a collection of the available pages in searchIndex.json
-    * The query will be compared with the contents of the description and tags in order to find a fitting result
+    * Busca entre las secciones de la app (searchIndex.json) por texto libre y por etiquetas.
+    * El filtro vive en services/busqueda.service.js: ignora tildes y mayúsculas, y las
+    * etiquetas se acumulan afinando la búsqueda; solo se ofrecen las que combinan.
     */
 const Buscar = () => {
   const [query, setQuery] = useState('');
+  const [etiquetas, setEtiquetas] = useState([]);
   const navigate = useNavigate();
-  
-  /** filteredResults
-    * The function in charge of computing  the results after filtering, creates a new list with only the matching results
-    */
-  const filteredResults = useMemo(() => {
-    if (!query.trim()) return [];
 
-    /** lowerQuery
-    * Makes sure the search can be filtered easily by normalizing to only lowercase
-    */
-    const lowerQuery = query.toLowerCase();
-    return searchData.filter((item) => {
-      return (
-        item.title.toLowerCase().includes(lowerQuery) ||
-        item.description.toLowerCase().includes(lowerQuery) ||
-        item.tags.some((tag) => tag.toLowerCase().includes(lowerQuery))
-      );
-    });
-  }, [query]);
+  const filteredResults = useMemo(
+    () => buscarSecciones(searchData, query, etiquetas),
+    [query, etiquetas]
+  );
+
+  const disponibles = useMemo(
+    () => etiquetasCompatibles(searchData, query, etiquetas, tagList),
+    [query, etiquetas]
+  );
+
+  const hayBusqueda = query.trim() !== '' || etiquetas.length > 0;
+  const sinResultados = hayBusqueda && filteredResults.length === 0;
+
+  const alternarEtiqueta = (tag) =>
+    setEtiquetas((actuales) =>
+      actuales.includes(tag) ? actuales.filter((t) => t !== tag) : [...actuales, tag]
+    );
+
+  /** Vuelve al inicio de la búsqueda: sin texto ni etiquetas. */
+  const reiniciar = () => {
+    setQuery('');
+    setEtiquetas([]);
+  };
+
+  /** Buscar solo por una etiqueta, desde las sugerencias del mensaje sin resultados. */
+  const buscarPorEtiqueta = (tag) => {
+    setQuery('');
+    setEtiquetas([tag]);
+  };
 
   return (
     <div>
@@ -46,16 +64,22 @@ const Buscar = () => {
           </div>
           
           {/* Search Bar Container */}
+          {/* La búsqueda es instantánea, así que Enter y la flecha no necesitan hacer nada.
+              Antes se pasaba onSearch={Buscar} (el propio componente) y eso rompía React.
+              Si la búsqueda no encontró nada, abrir las etiquetas (+) arranca de cero (HU-11). */}
           <SearchBar
             query={query}
             setQuery={setQuery}
-            onSearch={Buscar} 
+            etiquetas={etiquetas}
+            onToggleEtiqueta={alternarEtiqueta}
+            onAbrirEtiquetas={() => { if (sinResultados) reiniciar(); }}
+            etiquetasDisponibles={disponibles}
           />
 
 
           {/* Results Section */}
           <div className="space-y-4">
-            {query.trim() === '' ? (
+            {!hayBusqueda ? (
               <div className="text-center py-20 text-negro-txt">
                 <svg
                   className="mx-auto h-12 w-12 text-negro-txt"
@@ -105,12 +129,32 @@ const Buscar = () => {
               ))
             ) : (
               
-                <div className="text-center py-20 rounded-sm border border-dashed border-reg_bg2">
+                <div className="text-center py-16 px-4 rounded-sm border border-dashed border-reg_bg2">
                   <p className="text-negro-txt text-lg">
-                    No encontramos resultados para "<strong>{query}</strong>"
+                    {query.trim() ? (
+                      <>No encontramos resultados para "<strong>{query.trim()}</strong>"</>
+                    ) : (
+                      <>No encontramos secciones con esas etiquetas</>
+                    )}
+                    {query.trim() && etiquetas.length > 0 && <> con las etiquetas elegidas</>}
                   </p>
                   <p className="text-negro-txt text-sm mt-2">
-                    Prueba con otras palabras clave o revisa la ortografía.
+                    Prueba con otras palabras clave, o busca por etiquetas:
+                  </p>
+                  {/* Alternativa de navegación: las etiquetas (HU-11) */}
+                  <div className="mt-4 flex flex-wrap justify-center gap-2">
+                    {ETIQUETAS_SUGERIDAS.map((tag) => (
+                      <button
+                        key={tag}
+                        onClick={() => buscarPorEtiqueta(tag)}
+                        className="px-3 py-1 rounded-full text-sm border border-negro-txt text-negro-txt bg-transparent hover:bg-gris-bg2 cursor-pointer"
+                      >
+                        #{tag}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-negro-txt/60 text-xs mt-4">
+                    También puedes pulsar + para ver todas las etiquetas.
                   </p>
                 </div>
             )}

@@ -1,20 +1,27 @@
-import { useNavigate } from "react-router-dom";
 import TagPicker from "../atoms/TagPicker";
 
 /**
  * SearchBar — reusable organism
  *
  * Props:
- *  query        {string}   – controlled value
- *  setQuery     {fn}       – setter
- *  onSearch     {fn}       – called when arrow button is clicked (optional)
- *  placeholder  {string}   – input placeholder (optional)
+ *  query            {string}   – controlled value
+ *  setQuery         {fn}       – setter
+ *  onSearch         {fn}       – called when arrow button is clicked (optional)
+ *  placeholder      {string}   – input placeholder (optional)
+ *  etiquetas        {string[]} – etiquetas activas (HU-12)
+ *  onToggleEtiqueta {fn}       – activa o quita una etiqueta
+ *  onAbrirEtiquetas {fn}       – se llama al abrir la lista de etiquetas (optional)
+ *  etiquetasDisponibles {Set}  – etiquetas que combinan con las elegidas (optional)
  */
 const SearchBar = ({
   query,
   setQuery,
   onSearch,
   placeholder = "Escribe algo para buscar...",
+  etiquetas = [],
+  onToggleEtiqueta,
+  onAbrirEtiquetas,
+  etiquetasDisponibles,
 }) => {
   const handleSearch = () => {
     if (onSearch) onSearch(query);
@@ -85,7 +92,30 @@ const SearchBar = ({
         
         
       </div>
-      <TagPicker onTagSelect={(tag) => setQuery(q => q ? `${q} ${tag}` : tag)} />
+      {/* Botón + y etiquetas activas: cada una se quita por separado con su × */}
+      <div className="flex flex-wrap items-center gap-2">
+        <TagPicker
+          seleccionadas={etiquetas}
+          onToggle={onToggleEtiqueta}
+          onAbrir={onAbrirEtiquetas}
+          disponibles={etiquetasDisponibles}
+        />
+        {etiquetas.map((tag) => (
+          <span
+            key={tag}
+            className="inline-flex items-center gap-1 pl-3 pr-1 py-1 rounded-full text-sm bg-[#111] text-white"
+          >
+            #{tag}
+            <button
+              onClick={() => onToggleEtiqueta?.(tag)}
+              aria-label={`Quitar la etiqueta ${tag}`}
+              className="w-5 h-5 flex items-center justify-center rounded-full bg-transparent border-none text-white/80 hover:text-white hover:bg-white/20 cursor-pointer"
+            >
+              ×
+            </button>
+          </span>
+        ))}
+      </div>
     </div>
   );
 };
