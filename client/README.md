@@ -313,24 +313,24 @@ Los smoke tests existentes (`npm test`, con `TEST_EMAIL` / `TEST_PASSWORD` en `c
 
 ---
 
-## Sprint 4 — trazabilidad de código (avance) 🧭
+## Sprint 4 — trazabilidad de código 🧭
 
-> Sprint en curso (Búsqueda y Actividades). Estado al 14/10/2026. Para los criterios de aceptación y qué falta de cada historia, ver la sección **"Sprint 4"** en el `README.md` de la raíz del repo — nada de lo de abajo lo duplica.
+> Alcance solo del sprint (Búsqueda y Actividades). Para los criterios de aceptación completos de cada historia, ver la sección **"Sprint 4"** en el `README.md` de la raíz del repo — nada de lo de abajo lo duplica.
 
 | HU | Ruta(s) | Pages / componentes | Servicio / dato |
 |---|---|---|---|
-| HU-10 Búsqueda por palabras clave | `/buscar` | `pages/Buscar.jsx` (filtro con `useMemo`), `organisms/Search.jsx` (barra, botón limpiar, flecha) | `data/searchIndex.json` (8 secciones) |
-| HU-11 Búsqueda sin resultados | `/buscar` | `pages/Buscar.jsx` (mensaje "No encontramos resultados"), `atoms/TagPicker.jsx` (botón +) | — |
-| HU-12 Filtro por etiquetas | `/buscar` | `atoms/TagPicker.jsx` (lista de etiquetas), `organisms/Search.jsx` (agrega la etiqueta al texto) | `data/tagList.json` (22 etiquetas) |
-| HU-24 Ver actividades | `/actividades`, `/mapa` | `pages/Actividades.jsx` (tarjetas, cupos, insignia, enlace al mapa), `pages/Mapa.jsx` (recibe `location.state.ubicacionId`) | `eventos.service.js` (`getEventos`, `formatearFecha`), vista `eventos_con_cupo` |
-| HU-25 Inscribirse | `/actividades` | `pages/Actividades.jsx` (modal, "Participar", aviso) | `eventos.service.js` (`inscribirse`), tabla `inscripciones_evento` |
-| HU-26 Cancelar inscripción | `/actividades` | `pages/Actividades.jsx` (modal, "Cancelar inscripción", aviso) | `eventos.service.js` (`cancelarInscripcion`), tabla `inscripciones_evento` |
+| HU-10 Búsqueda por palabras clave | `/buscar` | `pages/Buscar.jsx`, `organisms/Search.jsx` (barra, botón limpiar, flecha) | `busqueda.service.js` (`normalizar`, `buscarSecciones`), `data/searchIndex.json` (7 secciones) |
+| HU-11 Búsqueda sin resultados | `/buscar` | `pages/Buscar.jsx` (mensaje con etiquetas sugeridas, `reiniciar`), `atoms/TagPicker.jsx` (botón +, `onAbrir`) | — |
+| HU-12 Filtro por etiquetas | `/buscar` | `atoms/TagPicker.jsx` (lista, etiquetas tachadas), `organisms/Search.jsx` (etiquetas activas con ×) | `busqueda.service.js` (`etiquetasCompatibles`), `data/tagList.json` (22 etiquetas) |
+| HU-24 Ver actividades | `/actividades`, `/mapa` | `pages/Actividades.jsx` (tarjetas con imagen, cupos, insignia, enlace al mapa), `pages/Mapa.jsx` (recibe `location.state.ubicacionId`) | `eventos.service.js` (`getEventos` filtra por fecha, `imagenDeEvento`), vista `eventos_con_cupo` (`imagen_lugar`) |
+| HU-25 Inscribirse | `/actividades` | `pages/Actividades.jsx` (modal, "Participar", confirmación dentro del modal) | `eventos.service.js` (`inscribirse`), tabla `inscripciones_evento`, trigger `trg_validar_inscripcion_evento` |
+| HU-26 Cancelar inscripción | `/actividades` | `pages/Actividades.jsx` (modal, "Cancelar inscripción", confirmación) | `eventos.service.js` (`cancelarInscripcion`), tabla `inscripciones_evento` |
 
-### Pendientes conocidos del Sprint 4 ⚠️
+> **Cómo se combinan las etiquetas:** `buscarSecciones` exige que la sección tenga todas las etiquetas elegidas (y cada palabra del texto). Para que eso nunca termine en 0 resultados, `etiquetasCompatibles` calcula qué etiquetas siguen dando secciones si se suman a las actuales; `TagPicker` desactiva y tacha el resto.
 
-1. **HU-10:** el filtro de `Buscar.jsx` solo pasa a minúsculas (`toLowerCase`); no quita tildes, así que "programacion" no encuentra "programación". `faqs.service.js` (`normalizar`) y `pages/Mapa.jsx` ya resuelven esto con `normalize("NFD")`.
-2. **HU-10:** `Buscar.jsx` pasa `onSearch={Buscar}` — el propio componente — a `SearchBar`; al pulsar Enter o la flecha se llama como función normal y React lanza "Invalid hook call" en la consola.
-3. **HU-11:** el botón + no limpia la búsqueda y el mensaje sin resultados no ofrece las etiquetas.
-4. **HU-12:** `Search.jsx` agrega cada etiqueta al texto (`"ayuda mapa"`) y `Buscar.jsx` busca la frase completa, por eso combinar etiquetas da 0 resultados. Las etiquetas no se guardan aparte, así que no hay chips para quitarlas una por una. `comida`, `descanso`, `parqueadero` y `auditorio` no aparecen en ninguna sección de `searchIndex.json`.
-5. **HU-24:** `getEventos()` no filtra por `fecha_inicio`; las 5 actividades de la base (5–15 sep 2026) ya pasaron y siguen apareciendo como disponibles.
-6. **HU-25/26:** el aviso de confirmación se renderiza fuera del modal (queda detrás del fondo oscuro). La política INSERT de `inscripciones_evento` solo valida `profile_id = auth.uid()`; el cupo no se controla en la base.
+> **Validación de inscripciones en la base:** la función `validar_inscripcion_evento()` (`security definer`) corre antes de cada `INSERT` en `inscripciones_evento`. Bloquea la fila del evento (`FOR UPDATE`) para que dos inscripciones simultáneas se atiendan en orden, y rechaza con `CUPO_LLENO`, `EVENTO_PASADO` o `EVENTO_NO_DISPONIBLE`. `inscribirse()` traduce esos códigos a mensajes en español.
+
+### Brechas conocidas del Sprint 4 ⚠️
+
+1. **HU-24:** las 5 actividades de `eventos` son datos de prueba (fechas corridas al 24 oct – 3 nov 2026) y ninguna tiene `imagen_url` propia; se muestra la foto del lugar (`imagen_lugar`).
+2. El flujo de inscripción se probó en el navegador con la sesión y la base simuladas; la regla de cupo y fecha se probó directamente en Supabase.
