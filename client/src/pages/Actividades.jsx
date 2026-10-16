@@ -7,7 +7,16 @@ import {
   inscribirse,
   cancelarInscripcion,
   formatearFecha,
+  imagenDeEvento,
+  IMAGEN_ACTIVIDAD_POR_DEFECTO,
 } from "../services/eventos.service";
+
+/** Si la imagen no carga, se cambia por la general de actividades (una sola vez). */
+const usarImagenPorDefecto = (e) => {
+  if (e.currentTarget.dataset.respaldo) return;
+  e.currentTarget.dataset.respaldo = "1";
+  e.currentTarget.src = IMAGEN_ACTIVIDAD_POR_DEFECTO;
+};
 
 export default function Actividades() {
   const [eventos, setEventos] = useState([]);
@@ -36,7 +45,11 @@ export default function Actividades() {
     cargarEventos();
   }, []);
 
-  const openModal = (evento) => setEventoActivo(evento);
+  // Al abrir otra actividad se limpia el mensaje de la anterior.
+  const openModal = (evento) => {
+    setAviso(null);
+    setEventoActivo(evento);
+  };
   const closeModal = () => setEventoActivo(null);
 
   /** Inscribe o cancela según el estado actual, y refresca los cupos. */
@@ -94,8 +107,8 @@ export default function Actividades() {
         <div className="px-10">
           <h2 className="text-4xl font-bold mb-8 text-negro-txt">Disponibles</h2>
 
-          {/* Aviso de resultado de la inscripción */}
-          {aviso && (
+          {/* Aviso de resultado de la inscripción (con el modal abierto se muestra dentro de él) */}
+          {aviso && !eventoActivo && (
             <div
               className={`mb-6 rounded-lg px-5 py-4 text-base ${
                 aviso.tipo === "ok"
@@ -126,7 +139,15 @@ export default function Actividades() {
           <div className="grid grid-cols-1 md:grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-8 mt-4">
             {eventos.map((evento) => (
               <div key={evento.evento_id} className="group rounded-xl overflow-hidden shadow-[0_0.25rem_0.9375rem_rgba(0,0,0,0.05)] flex flex-col transition-transform duration-300 hover:-translate-y-1 hover:shadow-[0_0.5rem_1.5625rem_rgba(0,0,0,0.15)]">
-                <div className="w-full h-50 overflow-hidden p-4 bg-blanco-bg" />
+                <div className="w-full h-50 overflow-hidden bg-gris-bg2">
+                  <img
+                    src={imagenDeEvento(evento)}
+                    alt={evento.titulo}
+                    loading="lazy"
+                    onError={usarImagenPorDefecto}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                </div>
 
                 <div className="p-6 text-center flex flex-col grow">
                   <h3 className="text-[1.6rem] font-bold mb-1 text-negro-txt">{evento.titulo}</h3>
@@ -182,7 +203,14 @@ export default function Actividades() {
               <div className="bg-blanco-bg rounded-xl w-full max-w-175 max-h-[90vh] overflow-y-auto relative shadow-[0_0.9375rem_3.125rem_rgba(0,0,0,0.3)] animate-[slideUp_0.4s_cubic-bezier(0.16,1,0.3,1)]" onClick={(e) => e.stopPropagation()}>
                 <button className="absolute top-3.75 left-3.75 w-10 h-10 bg-amarillo-xbtn text-negro-txt rounded-full text-lg font-bold flex items-center justify-center transition-transform hover:scale-110 hover:bg-[#fc0] z-10" onClick={closeModal}>X</button>
 
-                <div className="w-full h-87.5 p-6 pb-0" />
+                <div className="w-full h-64 md:h-80 overflow-hidden rounded-t-xl bg-gris-bg2">
+                  <img
+                    src={imagenDeEvento(eventoActivo)}
+                    alt={eventoActivo.titulo}
+                    onError={usarImagenPorDefecto}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
 
                 <div className="p-8 text-center">
                   <h2 className="text-[2.2rem] font-extrabold mb-2 text-negro-txt">{eventoActivo.titulo}</h2>
@@ -215,6 +243,20 @@ export default function Actividades() {
                         ? "Cancelar inscripción"
                         : "Participar"}
                     </button>
+                  )}
+
+                  {/* Confirmación dentro del modal, donde el usuario está mirando (HU-25/26) */}
+                  {aviso && (
+                    <div
+                      className={`mt-5 rounded-lg px-5 py-3 text-base ${
+                        aviso.tipo === "ok"
+                          ? "bg-[#e8f5e9] text-[#1b5e20] border border-[#a5d6a7]"
+                          : "bg-[#fdecea] text-[#b71c1c] border border-[#f5c6c2]"
+                      }`}
+                      role="status"
+                    >
+                      {aviso.texto}
+                    </div>
                   )}
                 </div>
               </div>
