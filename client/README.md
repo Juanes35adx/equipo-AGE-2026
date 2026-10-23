@@ -213,7 +213,7 @@ Los marcados *(sin Supabase)* viven en `/services` pero no tocan la base de dato
 | `profiles` | Datos del usuario, creada automáticamente por un trigger sobre `auth.users`. Los usuarios con sesión pueden leer todos los perfiles (así el foro muestra el nombre de cada autor); cada uno solo edita el suyo |
 | `ubicaciones` | Ubicaciones del campus que se muestran en el mapa |
 | `faqs` | Preguntas frecuentes |
-| `post` / `respuesta_post` / `likes_post` | Contenido del foro, respuestas y reacciones |
+| `post` / `respuesta_post` / `likes_post` | Contenido del foro, respuestas y reacciones. Una publicación con `post.archivado = true` deja de verse en el foro sin borrarse (así se ocultó el 23/10/2026 un hilo con una respuesta ofensiva) |
 | `mentores` / `contactos_mentor` | Directorio de mentores y registro de contactos |
 | `eventos` / `inscripciones_evento` | Actividades e inscripciones |
 | `profesores` | Directorio de profesores. **La app ya no lo usa** (la página se quitó el 23/10/2026; AGE es solo para estudiantes); la tabla se conserva |

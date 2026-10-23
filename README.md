@@ -468,7 +468,7 @@ Como usuario de AGE, quiero cancelar mi inscripción a una actividad, para poder
 3. Escribir "xyz": sale el mensaje sin resultados con etiquetas sugeridas; pulsar #tutoria lleva a Mentores. Pulsar + con una búsqueda sin resultados la deja en blanco.
 4. Pulsar + y elegir "ayuda" (3 secciones), luego "preguntas" (2) y "faq" (1). Con "ayuda" elegida, "mapa" aparece tachada. Quitar una etiqueta con su ×.
 5. Entrar a "Actividades": cada tarjeta tiene foto, lugar, fecha, cupos y "¿No sabes cómo llegar?". No aparecen actividades que ya pasaron.
-6. Abrir "Mas Información" y pulsar "Participar": el botón pasa a "Cancelar inscripción" y la confirmación aparece dentro del modal. Cancelar y ver que vuelve "Participar".
+6. Abrir "Más información" y pulsar "Participar": el botón pasa a "Cancelar inscripción" y la confirmación aparece dentro del modal. Cancelar y ver que vuelve "Participar".
 
 ---
 
