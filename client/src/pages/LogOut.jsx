@@ -1,7 +1,6 @@
 import React from 'react';
 import { useNavigate } from "react-router-dom";
 import Header from '../components/organisms/IniHeader';
-import Footer from "../components/organisms/Footer";
 import PageCard from '../components/atoms/Card';
 import Button from "../components/atoms/Button";
 
