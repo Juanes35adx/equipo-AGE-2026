@@ -1,7 +1,23 @@
 import PostContent from "../atoms/PostContainer";
 import Answer from "../organisms/Ans";
 
-const ThreadModal = ({ post, answers, onClose, onRespond, respuesta, setRespuesta, respondiendoA, setRespondiendoA }) => {
+/**
+ * Modal de una publicación del foro con sus respuestas.
+ * Las respuestas de primer nivel se muestran de a pocas: `respuestasVisibles` dice cuántas
+ * y "Cargar más" pide las siguientes (HU-21). Las anidadas siempre van con su respuesta.
+ */
+const ThreadModal = ({
+  post,
+  answers,
+  onClose,
+  onRespond,
+  respuesta,
+  setRespuesta,
+  respondiendoA,
+  setRespondiendoA,
+  respuestasVisibles = Infinity,
+  onCargarMas,
+}) => {
 
   return (
     <div
@@ -72,7 +88,7 @@ const ThreadModal = ({ post, answers, onClose, onRespond, respuesta, setRespuest
               Todavía no hay respuestas. Sé el primero en responder.
             </p>
           ) : (
-            answers.map((a) => (
+            answers.slice(0, respuestasVisibles).map((a) => (
               <Answer
                 key={a.respuesta_id}
                 respuesta={a}
@@ -82,11 +98,20 @@ const ThreadModal = ({ post, answers, onClose, onRespond, respuesta, setRespuest
           )}
         </div>
 
-        <div className="flex justify-center pt-1">
-          <button className="bg-rojo-enf/60 hover:bg-rojo-enf text-white text-sm font-medium px-7 py-2 rounded-full transition-colors cursor-pointer">
-            Cargar más
-          </button>
-        </div>
+        {/* Solo aparece mientras queden respuestas por mostrar */}
+        {answers.length > respuestasVisibles && (
+          <div className="flex flex-col items-center gap-1 pt-1">
+            <button
+              onClick={onCargarMas}
+              className="bg-rojo-enf/60 hover:bg-rojo-enf text-white text-sm font-medium px-7 py-2 rounded-full transition-colors cursor-pointer"
+            >
+              Cargar más
+            </button>
+            <span className="text-xs text-negro-txt/50">
+              Mostrando {respuestasVisibles} de {answers.length} respuestas
+            </span>
+          </div>
+        )}
       </modal>
     </div>
   );

@@ -4,9 +4,13 @@ import Header from "../components/organisms/Header2";
 import Footer from "../components/organisms/Footer";
 import PostContent from "../components/atoms/PostContainer"
 import ThreadModal from "../components/organisms/ModalForo";
-import Answer from "../components/organisms/Ans";                     
+import imagenForo from "../assets/students-upb.png";
 import { getPosts, createPost, getRespuestas, createRespuesta, getLikes, toggleLike, anidarRespuestas } from "../services/foro.service";
 
+
+// Cuántas publicaciones y respuestas se muestran al inicio y en cada "mostrar más" (HU-21).
+const POSTS_POR_PAGINA = 10;
+const RESPUESTAS_POR_PAGINA = 5;
 
 const ThumbIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -30,6 +34,8 @@ export default function Foro() {
   const [likes, setLikes] = useState({});
   const [conteoLikes, setConteoLikes] = useState({});
   const [respondiendoA, setRespondiendoA] = useState(null);
+  const [postsVisibles, setPostsVisibles] = useState(POSTS_POR_PAGINA);
+  const [respuestasVisibles, setRespuestasVisibles] = useState(RESPUESTAS_POR_PAGINA);
 
   useEffect(() => {
     getPosts().then(setPosts).finally(() => setLoading(false));
@@ -50,6 +56,7 @@ export default function Foro() {
 const handleVerPost = (post) => {
   if (!post?.post_id) return;          // ← keep this safety check
   setPostSeleccionado(post);
+  setRespuestasVisibles(RESPUESTAS_POR_PAGINA);
   getRespuestas(post.post_id).then(setRespuestas);
 };
 
@@ -60,7 +67,11 @@ const handleResponder = async (e) => {
   await createRespuesta(postSeleccionado.post_id, respuesta, respondiendoA?.respuesta_id ?? null);
   setRespuesta("");
   setRespondiendoA(null);
-  getRespuestas(postSeleccionado.post_id).then(setRespuestas);
+  const actualizadas = await getRespuestas(postSeleccionado.post_id);
+  setRespuestas(actualizadas);
+  // La respuesta nueva va al final: se amplía la lista para que el usuario la vea.
+  const primerNivel = actualizadas.filter((r) => !r.respuesta_padre_id).length;
+  setRespuestasVisibles((n) => Math.max(n, primerNivel));
 };
 
   /** Alterna el me gusta contra la base de datos y refresca los conteos. */
@@ -94,7 +105,7 @@ const handleResponder = async (e) => {
           </div>
           <div className="w-36 h-28 rounded-xl overflow-hidden bg-gray-200 shrink-0">
             <img
-              src="src/assets/students-upb.png"
+              src={imagenForo}
               alt="Estudiantes UPB"
               className="w-full h-full object-cover"
               onError={(e) => {
@@ -142,8 +153,12 @@ const handleResponder = async (e) => {
         <div className="flex flex-col gap-3 mb-6">
           {loading ? (
             <p>Cargando...</p>
+          ) : posts.length === 0 ? (
+            <p className="text-sm text-negro-txt/70">
+              Todavía no hay publicaciones. Sé el primero en preguntar.
+            </p>
           ) : (
-            posts.map((p) => (
+            posts.slice(0, postsVisibles).map((p) => (
               <div
                 key={p.post_id}
                 className="flex items-center gap-3 p-4 bg-gray-100 rounded-xl border border-gray-200"
@@ -188,9 +203,15 @@ const handleResponder = async (e) => {
           )}
         </div>
 
-        <button className="block mx-auto px-8 py-2 bg-red-600 text-white text-sm font-medium rounded-full hover:bg-red-700 transition">
-          Mostrar Mas...
-        </button>
+        {/* Solo aparece mientras queden publicaciones por mostrar */}
+        {!loading && posts.length > postsVisibles && (
+          <button
+            onClick={() => setPostsVisibles((n) => n + POSTS_POR_PAGINA)}
+            className="block mx-auto px-8 py-2 bg-red-600 text-white text-sm font-medium rounded-full hover:bg-red-700 transition cursor-pointer"
+          >
+            Mostrar más...
+          </button>
+        )}
 
         {/* Thread modal — using the ThreadModal component */}
         {postSeleccionado && (
@@ -211,6 +232,8 @@ const handleResponder = async (e) => {
                 respuesta_padre_id: r.respuesta_padre_id,
               }))
             )}
+            respuestasVisibles={respuestasVisibles}
+            onCargarMas={() => setRespuestasVisibles((n) => n + RESPUESTAS_POR_PAGINA)}
             onClose={() => { setPostSeleccionado(null); setRespondiendoA(null); }}
             onRespond={handleResponder}
             respuesta={respuesta}
