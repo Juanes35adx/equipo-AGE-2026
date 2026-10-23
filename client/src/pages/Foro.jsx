@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Header from "../components/organisms/Header2";
 import Footer from "../components/organisms/Footer";
 import PostContent from "../components/atoms/PostContainer"
@@ -121,7 +121,11 @@ const handleResponder = async (e) => {
         <div className="mb-6">
           <h3 className="text-xl font-bold text-negro-txt mb-2">Recuerda que....</h3>
           <p className="text-sm text-negro-txt">
-            Ante toda duda puedes también utilizar el medio de preguntas frecuentes en el cual puedes preguntar directamente a la asesoría integral
+            Antes de preguntar, revisa si tu duda ya está en las{" "}
+            <Link to="/faqs" className="underline font-medium">preguntas frecuentes</Link>. Si es un trámite o
+            necesitas una respuesta oficial, escríbele a Asesoría Integral a{" "}
+            <a href="mailto:asesoria.integral@upb.edu.co" className="underline font-medium">asesoria.integral@upb.edu.co</a>{" "}
+            o visítala en el Bloque 24.
           </p>
         </div>
 
