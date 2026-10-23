@@ -190,7 +190,7 @@ export default function Actividades() {
                     className="bg-[#e3001b] text-white rounded-lg py-3 px-6 text-[1.1rem] font-bold cursor-pointer w-full transition-all duration-300 hover:bg-[#bf0015] hover:-translate-y-0.5"
                     onClick={() => openModal(evento)}
                   >
-                    Mas Información
+                    Más información
                   </button>
                 </div>
               </div>

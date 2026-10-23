@@ -59,7 +59,7 @@ const Buscar = () => {
           {/* Header Section */}
           <div className="mb-10">
             <h1 className="text-4xl font-bold text-negro-txt mb-2">
-              Sección de Busquedas
+              Sección de Búsquedas
             </h1>
           </div>
           

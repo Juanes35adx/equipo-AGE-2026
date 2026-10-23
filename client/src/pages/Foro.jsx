@@ -222,7 +222,7 @@ const handleResponder = async (e) => {
               question: postSeleccionado.titulo,
               meta: `${postSeleccionado.profiles?.full_name || ""} · ${new Date(
                 postSeleccionado.fecha
-              ).toLocaleDateString()}`,
+              ).toLocaleDateString("es-CO", { day: "numeric", month: "short", year: "numeric" })}`,
               contenido: postSeleccionado.contenido,
             }}
             answers={anidarRespuestas(
