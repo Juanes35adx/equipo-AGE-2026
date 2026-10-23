@@ -128,3 +128,29 @@ body {
   0%   { transform: scale(0.8); opacity: 1; }
   100% { transform: scale(2.2); opacity: 0; }
 }
+
+/* Alto contraste (HU-28). Las variables solo cambian lo que usa negro-txt y blanco-bg; estas reglas
+   pasan a negro las superficies claras escritas con colores fijos y a blanco su texto. */
+html.alto-contraste :is(.bg-white, .bg-blanco-bg, .bg-gray-100, .bg-gray-200, .bg-rosa-menu, .bg-gris-bg2, [class~="bg-[#f5f5f5]"]) {
+  background-color: #000 !important;
+}
+html.alto-contraste :is(.text-gray-400, .text-gray-500, .text-gray-600, .text-gray-800, .text-gray-900, .text-griso-prf, .text-black,
+  [class~="text-[#333]"], [class~="text-[#555]"], [class~="text-[#888]"], [class~="text-[#242424]"], [class~="text-[#1a1a1a]"]) {
+  color: #fff !important;
+}
+html.alto-contraste :is(.border-gray-100, .border-gray-200, .border-gray-300, .border-gris-bg2,
+  [class~="border-[#ddd]"], [class~="border-[#ccc]"], [class~="border-[#eee]"], [class~="border-[#eaeaea]"], [class~="border-[#e0e0e0]"]) {
+  border-color: #fff !important;
+}
+/* Paneles semitransparentes sobre fotos o el mapa (encabezado de Actividades, leyenda del mapa). */
+html.alto-contraste :is([class~="bg-gris-bg2/85"], [class~="bg-blanco-bg/95"], [class~="bg-blanco-bg/90"]) {
+  background-color: rgb(0 0 0 / 0.85) !important;
+}
+/* Botones oscuros sobre fondo negro: un borde blanco los delimita. */
+html.alto-contraste :is(.bg-gray-900, .bg-black, [class~="bg-[#111]"]) {
+  box-shadow: 0 0 0 1px #fff;
+}
+/* Íconos y logos negros que desaparecerían sobre el negro. */
+html.alto-contraste [stroke="#111"] { stroke: #fff; }
+html.alto-contraste [fill="#111"] { fill: #fff; }
+html.alto-contraste :is(img[src*="upb-b"], img[alt="User Icon"]) { filter: invert(1); }

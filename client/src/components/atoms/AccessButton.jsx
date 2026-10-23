@@ -23,7 +23,7 @@ export default function AccessButton(){
     }, [isOpen]);
 
     return(
-        <div className="relative" ref={ref}>
+        <div className="relative shrink-0" ref={ref}>
             <img
                 src={img}
                 alt="Accesibilidad"

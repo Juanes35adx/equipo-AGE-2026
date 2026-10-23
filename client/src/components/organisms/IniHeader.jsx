@@ -9,7 +9,7 @@ const IniHeader = () => {
     {/* Left: Accessibility button */}
     <div className="flex flex-col items-center">
       <AccessButton />
-      <span className="text-[0.625rem] text-negro-txt font-bold mt-0.5">
+      <span className="text-xs text-negro-txt font-bold mt-0.5">
         Accesibilidad
       </span>
     </div>
