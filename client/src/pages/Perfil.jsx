@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../services/auth.service";
 import { getProfile } from "../services/profile.service";
+import { getNotificaciones } from "../services/notificaciones.service";
 import Header from "../components/organisms/Header2";
 import Footer from "../components/organisms/Footer";
 import Button from "../components/atoms/Button";
@@ -10,6 +11,8 @@ export default function Perfil() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [notificaciones, setNotificaciones] = useState([]);
+  const [cargandoNotificaciones, setCargandoNotificaciones] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,6 +23,12 @@ export default function Perfil() {
         })
         .catch((e) => setError(e.message))
         .finally(() => setLoading(false));
+
+      // Si fallan, el perfil se sigue mostrando; solo queda el mensaje de "sin notificaciones".
+      getNotificaciones()
+        .then(setNotificaciones)
+        .catch((e) => console.error("No se pudieron cargar las notificaciones:", e.message))
+        .finally(() => setCargandoNotificaciones(false));
   }, []);
   
   const handleLogout = async () => {
@@ -71,11 +80,34 @@ export default function Perfil() {
 
           {/* Área de Notificaciones y Acciones */}
           <div className="flex flex-col h-full">
-            <h2 className="text-[1.5rem] md:text-[1.8rem] font-bold text-negro-txt text-center mb-8 md:mb-12 mt-4">No tienes ninguna notificación!</h2>
-            
-            <div className="text-center text-xl text-[#333] mb-auto">
-              {/* Notificaciones vacías según solicitud */}
-            </div>
+            {/* HU-27: próximas actividades inscritas y respuestas recientes a tus publicaciones */}
+            {cargandoNotificaciones ? (
+              <p className="text-center text-negro-txt/60 mt-4 mb-auto">Cargando notificaciones...</p>
+            ) : notificaciones.length === 0 ? (
+              <h2 className="text-[1.5rem] md:text-[1.8rem] font-bold text-negro-txt text-center mb-8 md:mb-12 mt-4">No tienes ninguna notificación!</h2>
+            ) : (
+              <div className="mb-auto">
+                <h2 className="text-[1.5rem] md:text-[1.8rem] font-bold text-negro-txt text-center md:text-left mb-4 mt-4">
+                  Notificaciones
+                </h2>
+                <ul className="list-none p-0 m-0 flex flex-col gap-3">
+                  {notificaciones.map((n) => (
+                    <li key={n.id}>
+                      <button
+                        onClick={() => navigate(n.ruta)}
+                        className="w-full text-left flex items-start gap-3 bg-blanco-bg border border-gray-200 rounded-lg px-4 py-3 cursor-pointer transition-shadow hover:shadow-md"
+                      >
+                        <span className="text-xl shrink-0" aria-hidden="true">{n.tipo === "actividad" ? "📅" : "💬"}</span>
+                        <span className="min-w-0">
+                          <span className="block text-sm font-semibold text-negro-txt">{n.titulo}</span>
+                          <span className="block text-xs text-negro-txt/60 mt-0.5 first-letter:uppercase">{n.detalle}</span>
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             <div className="flex flex-col md:flex-row justify-center gap-4 md:gap-8 mt-8 md:mt-16 px-4 md:px-20 h-auto md:h-18">
               <Button 
