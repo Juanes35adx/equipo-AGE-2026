@@ -19,7 +19,7 @@ const Header2 = () => {
           <img
           src="upb.png"
           alt="UPB Logo"
-          className="h-10 md:h-14 w-auto object-contain cursor-pointer ml-6 md:ml-8"
+          className="h-10 md:h-14 w-auto min-w-0 max-w-[25%] md:max-w-none object-contain cursor-pointer ml-1 md:ml-8"
           onClick={() => navigate("/dashboard")}
           />
 

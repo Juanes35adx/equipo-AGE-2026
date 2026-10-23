@@ -230,10 +230,10 @@ export default function Mapa() {
                             {b.icon ?? "🏛️"}
                           </div>
                         )}
-                        <span className="block text-[0.65rem] leading-tight text-negro-txt/70">
+                        <span className="block text-xs leading-tight text-negro-txt/70">
                           {b.name}
                         </span>
-                        <span className="block text-[0.6rem] text-negro-txt/50">
+                        <span className="block text-[0.6875rem] text-negro-txt/60">
                           {b.metros} m
                         </span>
                       </button>

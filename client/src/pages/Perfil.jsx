@@ -109,7 +109,7 @@ export default function Perfil() {
               </div>
             )}
 
-            <div className="flex flex-col md:flex-row justify-center gap-4 md:gap-8 mt-8 md:mt-16 px-4 md:px-20 h-auto md:h-18">
+            <div className="flex flex-col md:flex-row justify-center gap-4 md:gap-8 mt-8 md:mt-16 px-4 md:px-4 h-auto md:h-18">
               <Button 
                 variant="header"
                 onClick={handleLogout}

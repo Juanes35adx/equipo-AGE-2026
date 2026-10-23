@@ -118,7 +118,7 @@ export default function Mentores() {
                 id="filtro-materia"
                 value={materiaSeleccionada}
                 onChange={(e) => setMateriaSeleccionada(e.target.value)}
-                className="w-full sm:w-auto min-w-[16rem] bg-gris-bg2 border border-[#ddd] rounded-lg py-3 px-4 text-base text-negro-txt cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#e3001b]/40"
+                className="w-full sm:w-auto sm:min-w-[16rem] bg-gris-bg2 border border-[#ddd] rounded-lg py-3 px-4 text-base text-negro-txt cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#e3001b]/40"
               >
                 <option value="">Todas las materias ({mentores.length})</option>
                 {materias.map((materia) => (
