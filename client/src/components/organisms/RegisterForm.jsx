@@ -8,6 +8,7 @@ export default function RegisterForm() {
     fullName: "",
     email: "",
     password: "",
+    // AGE es solo para estudiantes: el rol ya no se elige en el formulario.
     role: "estudiante",
     programa: "",
     semestre: "",
@@ -116,22 +117,6 @@ export default function RegisterForm() {
           required
           className="rounded-lg border border-[#ccc] px-3 py-2.5 text-[0.9375rem] outline-none placeholder-negro-txt/70"
         />
-      </div>
-
-      <div className="flex flex-col gap-1.5">
-        <label className="text-[0.875rem] text-negro-txt/70">
-          Rol
-        </label>
-
-        <select
-          name="role"
-          value={form.role}
-          onChange={handleChange}
-          className="rounded-lg border border-[#ccc] px-3 py-2.5 text-[0.9375rem] outline-none text-negro-txt/70"
-        >
-          <option value="estudiante">Estudiante</option>
-          <option value="profesor">Profesor</option>
-        </select>
       </div>
 
       <div className="flex flex-col gap-1.5">
