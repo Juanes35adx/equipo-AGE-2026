@@ -47,7 +47,7 @@ function asegurarKeyframesPulso() {
   document.head.appendChild(style);
 }
 
-export default function MAPMap({ onMarkerSelect, focusPoi, puntos = [] }) {
+export default function MAPMap({ onMarkerSelect, focusPoi, puntos = [], onVistaCambia }) {
   const mapRef      = useRef(null);
   const mapInstance = useRef(null);
   const poisLayer   = useRef(null);
@@ -56,6 +56,8 @@ export default function MAPMap({ onMarkerSelect, focusPoi, puntos = [] }) {
   const watchCleanupRef = useRef(null);
   const onMarkerSelectRef = useRef(onMarkerSelect);
   onMarkerSelectRef.current = onMarkerSelect;
+  const onVistaCambiaRef = useRef(onVistaCambia);
+  onVistaCambiaRef.current = onVistaCambia;
 
   const [mapaListo, setMapaListo] = useState(false);
   // HU-08: solicitud explícita + alternativa si se deniega
@@ -102,6 +104,18 @@ export default function MAPMap({ onMarkerSelect, focusPoi, puntos = [] }) {
     poisLayer.current = L.layerGroup().addTo(map);
     mapInstance.current = map;
     setMapaListo(true);
+
+    // Avisa qué zona del mapa se está viendo, para los bloques cercanos (HU-30).
+    const reportarVista = () => {
+      const b = map.getBounds();
+      const c = map.getCenter();
+      onVistaCambiaRef.current?.({
+        sur: b.getSouth(), oeste: b.getWest(), norte: b.getNorth(), este: b.getEast(),
+        centro: { lat: c.lat, lng: c.lng },
+      });
+    };
+    map.on("moveend resize", reportarVista);
+    reportarVista();
 
     // Si el usuario arrastra el mapa para mirar otra zona, se deja de seguirlo.
     map.on("dragstart", () => {

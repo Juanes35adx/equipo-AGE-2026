@@ -4,7 +4,7 @@ import Header from "../components/organisms/Header2"
 import Footer from "../components/organisms/Footer"
 import MapInfo from "../components/organisms/MapInfo";
 import { getUbicaciones } from "../services/ubicaciones.service";
-import { PIN_LEYENDA, bloquesCercanos } from "../services/mapa.service";
+import { PIN_LEYENDA, bloquesCercanos, bloquesEnVista } from "../services/mapa.service";
 
 export default function Mapa() {
   const [puntos, setPuntos] = useState([]);
@@ -13,6 +13,8 @@ export default function Mapa() {
   const [selectedPoiElegido, setSelectedPoiElegido] = useState(null);
   const [focusPoiElegido, setFocusPoiElegido] = useState(null);
   const [consulta, setConsulta] = useState("");
+  // Zona visible del mapa, para los bloques cercanos cuando no hay un lugar elegido (HU-30).
+  const [vista, setVista] = useState(null);
   const [errorCarga, setErrorCarga] = useState(null);
   const navigate = useNavigate();
   const { state } = useLocation();
@@ -60,8 +62,8 @@ export default function Mapa() {
 
   /** Los tres bloques más cercanos al punto seleccionado. */
   const cercanos = useMemo(
-    () => (selectedPoi ? bloquesCercanos(selectedPoi, puntos, 3) : []),
-    [selectedPoi, puntos]
+    () => (selectedPoi ? bloquesCercanos(selectedPoi, puntos, 3) : bloquesEnVista(vista, puntos, 3)),
+    [selectedPoi, puntos, vista]
   );
 
   const irAlLugar = (poi) => {
@@ -154,7 +156,7 @@ export default function Mapa() {
 
             {/* Mapa: llena el espacio libre; la leyenda va encima, en la esquina */}
             <section className="relative isolate h-[60vh] md:h-auto md:flex-1 min-h-80 rounded-xl overflow-hidden border border-gray-200">
-              <MapInfo onMarkerSelect={setSelectedPoiElegido} focusPoi={focusPoi} puntos={puntos} />
+              <MapInfo onMarkerSelect={setSelectedPoiElegido} focusPoi={focusPoi} puntos={puntos} onVistaCambia={setVista} />
 
               {/* ── Leyenda de colores de los pines (HU-35) ─────────────── */}
               <div
@@ -179,54 +181,65 @@ export default function Mapa() {
               {selectedPoi ? (
                 <>
                   <h2 className="text-lg text-negro-txt mb-2 font-bold">{selectedPoi.name}</h2>
-                  {selectedPoi.image && (
+                  {selectedPoi.image ? (
                     <img
                       src={selectedPoi.image}
                       alt={selectedPoi.name}
                       className="w-full h-40 object-cover rounded-lg mb-3"
                     />
+                  ) : (
+                    // Lugar sin foto todavía: se muestra su ícono para que el panel no quede vacío (HU-09).
+                    <div className="w-full h-40 rounded-lg mb-3 bg-gris-bg2 flex flex-col items-center justify-center gap-1">
+                      <span className="text-5xl" aria-hidden="true">{selectedPoi.icon ?? "📍"}</span>
+                      <span className="text-xs text-negro-txt/50">Sin foto por ahora</span>
+                    </div>
                   )}
                   <p className="text-sm text-negro-txt mb-3">{selectedPoi.description}</p>
                   <small className="text-xs text-gray-400">
                     {selectedPoi.position.lat.toFixed(6)},{" "}
                     {selectedPoi.position.lng.toFixed(6)}
                   </small>
-
-                  {/* ── Bloques cercanos ──────────────────────────────────── */}
-                  {cercanos.length > 0 && (
-                    <section className="mt-6">
-                      <h3 className="text-sm font-bold text-negro-txt mb-3">Bloques Cercanos</h3>
-                      <div className="grid grid-cols-3 gap-2">
-                        {cercanos.map((b) => (
-                          <button
-                            key={b.id}
-                            onClick={() => irAlLugar(b)}
-                            title={b.name + " · a " + b.metros + " m"}
-                            className="bg-transparent border-none p-0 cursor-pointer text-left"
-                          >
-                            {b.image ? (
-                              <img
-                                src={b.image}
-                                alt={b.name}
-                                className="w-full h-14 object-cover rounded-md mb-1"
-                              />
-                            ) : (
-                              <div className="w-full h-14 rounded-md mb-1 bg-gris-bg2" />
-                            )}
-                            <span className="block text-[0.65rem] leading-tight text-negro-txt/70">
-                              {b.name}
-                            </span>
-                            <span className="block text-[0.6rem] text-negro-txt/50">
-                              {b.metros} m
-                            </span>
-                          </button>
-                        ))}
-                      </div>
-                    </section>
-                  )}
                 </>
               ) : (
                 <p className="text-sm text-negro-txt m-0">Selecciona un marcador para conocer los detalles</p>
+              )}
+
+              {/* ── Bloques cercanos (HU-30): al lugar elegido o, sin elegir, a la zona visible ── */}
+              {cercanos.length > 0 && (
+                <section className="mt-6">
+                  <h3 className="text-sm font-bold text-negro-txt mb-1">Bloques Cercanos</h3>
+                  <p className="text-[0.7rem] text-negro-txt/50 mb-3">
+                    {selectedPoi ? `A ${selectedPoi.name}` : "En la zona que estás viendo del mapa"}
+                  </p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {cercanos.map((b) => (
+                      <button
+                        key={b.id}
+                        onClick={() => irAlLugar(b)}
+                        title={b.name + " · a " + b.metros + " m"}
+                        className="bg-transparent border-none p-0 cursor-pointer text-left"
+                      >
+                        {b.image ? (
+                          <img
+                            src={b.image}
+                            alt={b.name}
+                            className="w-full h-14 object-cover rounded-md mb-1"
+                          />
+                        ) : (
+                          <div className="w-full h-14 rounded-md mb-1 bg-gris-bg2 flex items-center justify-center text-2xl" aria-hidden="true">
+                            {b.icon ?? "🏛️"}
+                          </div>
+                        )}
+                        <span className="block text-[0.65rem] leading-tight text-negro-txt/70">
+                          {b.name}
+                        </span>
+                        <span className="block text-[0.6rem] text-negro-txt/50">
+                          {b.metros} m
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </section>
               )}
             </aside>
 

@@ -29,6 +29,28 @@ export function distanciaEnMetros(a, b) {
 }
 
 /**
+ * Bloques que se ven en la zona actual del mapa, del más cercano al más lejano del
+ * centro de la vista (HU-30). Se usa cuando el usuario todavía no eligió un lugar.
+ *
+ * @param {{sur:number, oeste:number, norte:number, este:number, centro:{lat:number,lng:number}}|null} vista
+ *   Límites de la zona visible, tal como los reporta el mapa al moverse.
+ * @param {Array} puntos Listado completo de marcadores.
+ * @param {number} [cuantos=3] Cantidad máxima de bloques a devolver.
+ * @returns {Array} Bloques con la propiedad extra `metros` (distancia al centro de la vista).
+ */
+export function bloquesEnVista(vista, puntos, cuantos = 3) {
+  if (!vista) return [];
+  const { sur, oeste, norte, este, centro } = vista;
+
+  return puntos
+    .filter((p) => String(p.type).toLowerCase() === "bloque")
+    .filter((p) => p.position.lat >= sur && p.position.lat <= norte && p.position.lng >= oeste && p.position.lng <= este)
+    .map((p) => ({ ...p, metros: Math.round(distanciaEnMetros(centro, p.position)) }))
+    .sort((a, b) => a.metros - b.metros)
+    .slice(0, cuantos);
+}
+
+/**
  * Devuelve los bloques más cercanos a un punto, ordenados de menor a mayor distancia.
  * Excluye el propio punto y los lugares que no son bloques.
  *
