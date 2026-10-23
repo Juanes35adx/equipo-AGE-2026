@@ -3,6 +3,20 @@ import { useNavigate } from "react-router-dom";
 import { register, logout } from "../../services/auth.service";
 import careerList from "../../data/careerList.json";
 
+/**
+ * Traduce los errores de Supabase Auth del registro al español.
+ * @param {string} mensaje Mensaje original de la excepción.
+ */
+function traducirErrorRegistro(mensaje) {
+  const m = (mensaje ?? "").toLowerCase();
+  if (m.includes("at least 6")) return "La contraseña debe tener al menos 6 caracteres.";
+  if (m.includes("already registered") || m.includes("already exists")) return "Ya existe una cuenta con ese correo. Inicia sesión.";
+  if (m.includes("invalid") && m.includes("email")) return "El correo no es válido.";
+  if (m.includes("rate limit")) return "Demasiados intentos. Espera unos minutos e inténtalo de nuevo.";
+  if (m.includes("failed to fetch") || m.includes("network")) return "No pudimos conectarnos. Revisa tu conexión a internet.";
+  return "No pudimos crear la cuenta. Inténtalo de nuevo.";
+}
+
 export default function RegisterForm() {
   const [form, setForm] = useState({
     fullName: "",
@@ -47,7 +61,7 @@ export default function RegisterForm() {
         state: { mensaje: "Tu cuenta fue creada. Inicia sesión para continuar." },
       });
     } catch (err) {
-      setError(err.message);
+      setError(traducirErrorRegistro(err.message));
     } finally {
       setLoading(false);
     }
