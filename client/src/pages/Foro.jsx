@@ -95,15 +95,15 @@ const handleResponder = async (e) => {
     <div>
       <Header />
       
-      <div className="px-10 py-10">
+      <div className="px-4 md:px-10 py-10">
         <div className="flex items-start gap-4 mb-6">
-          <div className="flex-1">
+          <div className="flex-1 min-w-0 wrap-break-word">
             <h2 className="text-2xl font-bold text-negro-txt mb-2">Bienvenido al Foro comunitario</h2>
             <p className="text-sm text-negro-txt">
               Aquí podrás publicar dudas generales que tengas para que la comunidad UPB te responda.
             </p>
           </div>
-          <div className="w-36 h-28 rounded-xl overflow-hidden bg-gray-200 shrink-0">
+          <div className="w-24 h-20 md:w-36 md:h-28 rounded-xl overflow-hidden bg-gray-200 shrink-0">
             <img
               src={imagenForo}
               alt="Estudiantes UPB"
@@ -166,8 +166,11 @@ const handleResponder = async (e) => {
                 {/* PostContent handles avatar + stacked name */}
                 <div className="flex-1 min-w-0">
                   <PostContent name={p.profiles?.full_name || "?"}>
-                    <p className="text-sm font-medium text-gray-800 leading-snug mb-1">
+                    <p className="text-sm font-medium text-gray-800 leading-snug">
                       {p.titulo}
+                    </p>
+                    <p className="text-xs text-gray-500 mb-1">
+                      {new Date(p.fecha).toLocaleDateString("es-CO", { day: "numeric", month: "short", year: "numeric" })}
                     </p>
                     <p className="text-sm text-gray-600 leading-snug mb-2 line-clamp-2">
                       {p.contenido}
@@ -182,11 +185,9 @@ const handleResponder = async (e) => {
                 </div>
 
                 {/* Like button */}
-                {conteoLikes[p.post_id] > 0 && (
-                  <span className="text-sm text-negro-txt/60 shrink-0 self-center mr-1">
-                    {conteoLikes[p.post_id]}
-                  </span>
-                )}
+                <span className="text-sm text-negro-txt/60 shrink-0 self-center mr-1">
+                  {conteoLikes[p.post_id] ?? 0}
+                </span>
                 <button
                   onClick={() => handleLike(p.post_id)}
                   className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-colors ${

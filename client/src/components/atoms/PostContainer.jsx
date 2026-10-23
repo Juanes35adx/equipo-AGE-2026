@@ -5,11 +5,11 @@ const PostContent = ({ name, children }) => {
 
   return (
     <div className="flex items-start gap-3">
-      <div className="flex flex-col items-center gap-1 shrink-0">
+      <div className="flex flex-col items-center gap-1 shrink-0 w-16 sm:w-24">
         <div className="w-9 h-9 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center overflow-hidden">
           <img src={UserIcon} alt="User Icon" className="w-full h-full object-cover" />
         </div>
-        <span className="text-[0.75] text-gray-500 font-medium text-center leading-tight">
+        <span className="w-full text-xs text-gray-500 font-medium text-center leading-tight wrap-break-word">
           {first}
           {rest.length > 0 && (
             <>
