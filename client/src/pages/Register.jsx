@@ -1,6 +1,5 @@
 import RegisterForm from "../components/organisms/RegisterForm";
 import Header from "../components/organisms/IniHeader"
-import { useNavigate } from "react-router-dom";
 
 export default function Register() {
   return (

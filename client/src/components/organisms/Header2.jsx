@@ -1,6 +1,5 @@
 import React from 'react';
 import { useNavigate } from "react-router-dom";
-import { logout } from "../../services/auth.service";
 import Button from "../atoms/Button";
 import { useMenu } from "../../context/MenuContext";
 import AccessButton from '../atoms/AccessButton';
@@ -8,11 +7,6 @@ import AccessButton from '../atoms/AccessButton';
 const Header2 = () => {
   const navigate = useNavigate();
   const { toggleMenu } = useMenu();
-
-  const handleLogout = async () => {
-    await logout();
-    navigate("/");
-  };
 
 
   return (

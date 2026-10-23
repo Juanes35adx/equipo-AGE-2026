@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from "react-router-dom";
 import Header from '../components/organisms/IniHeader';
 import Footer from "../components/organisms/Footer";

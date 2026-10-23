@@ -16,6 +16,8 @@ export const MenuProvider = ({ children }) => {
   );
 };
 
+// El hook vive junto a su proveedor; separarlo solo por la recarga en caliente complicaría los imports.
+// eslint-disable-next-line react-refresh/only-export-components
 export const useMenu = () => {
   const context = useContext(MenuContext);
   if (!context) {
