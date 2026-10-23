@@ -184,6 +184,7 @@ Todo lo que habla con el mundo exterior. Ninguna page o componente consulta Supa
 | `supabase.js` | Crea el único cliente de Supabase que usan todos los demás servicios |
 | `auth.service.js` | Login, registro, logout, sesión |
 | `profile.service.js` | Perfil del usuario actual |
+| `accesibilidad.service.js` | Tamaño de texto y alto contraste guardados; se aplican al arrancar (`main.jsx`) *(sin Supabase)* |
 | `faqs.service.js` | Preguntas del FAQ |
 | `foro.service.js` | Publicaciones, respuestas, respuestas anidadas, likes |
 | `mentores.service.js` | Directorio de mentores, deep link de Teams, registro de contactos |
@@ -194,7 +195,7 @@ Todo lo que habla con el mundo exterior. Ninguna page o componente consulta Supa
 | `location.service.js` | GPS del dispositivo y permiso en tiempo de ejecución *(sin Supabase)* |
 | `busqueda.service.js` | Búsqueda de secciones y etiquetas compatibles *(sin Supabase)* |
 
-Los tres marcados *(sin Supabase)* viven en `/services` pero no tocan la base de datos — la carpeta terminó significando "todo lo que no es interfaz".
+Los marcados *(sin Supabase)* viven en `/services` pero no tocan la base de datos — la carpeta terminó significando "todo lo que no es interfaz".
 
 ### Sobre `/data` 📦
 
@@ -209,7 +210,7 @@ Los tres marcados *(sin Supabase)* viven en `/services` pero no tocan la base de
 
 | Tabla | Propósito |
 |---|---|
-| `profiles` | Datos del usuario, creada automáticamente por un trigger sobre `auth.users` |
+| `profiles` | Datos del usuario, creada automáticamente por un trigger sobre `auth.users`. Los usuarios con sesión pueden leer todos los perfiles (así el foro muestra el nombre de cada autor); cada uno solo edita el suyo |
 | `ubicaciones` | Ubicaciones del campus que se muestran en el mapa |
 | `faqs` | Preguntas frecuentes |
 | `post` / `respuesta_post` / `likes_post` | Contenido del foro, respuestas y reacciones |
@@ -296,7 +297,7 @@ Los smoke tests existentes (`npm test`, con `TEST_EMAIL` / `TEST_PASSWORD` en `c
 | HU-35 Leyenda de colores | `/mapa` | `pages/Mapa.jsx` (leyenda sobre el mapa, esquina superior derecha), `atoms/Marker.jsx` (`PIN_COLORS`) | `mapa.service.js` (`PIN_LEYENDA`) |
 | HU-36 Buscar en el mapa | `/mapa` | `pages/Mapa.jsx` (buscador, lista de resultados, `irAlLugar`), `organisms/MapInfo.jsx` (`flyTo` al lugar elegido) | `ubicaciones.service.js` |
 | HU-27 Consultar mi perfil | `/perfil` | `pages/Perfil.jsx` (datos y lista de notificaciones), `atoms/Button.jsx` | `profile.service.js` (`getProfile`), `notificaciones.service.js` (`getNotificaciones`), `auth.service.js` (`logout`), tabla `profiles` |
-| HU-28 Accesibilidad | todas (por página) | `atoms/AccessButton.jsx`, `atoms/AccessOpts.jsx`, `atoms/SizeButton.jsx`, `atoms/ContrastButton.jsx`, usados en `organisms/Header2.jsx` e `organisms/IniHeader.jsx` | `localStorage` (`font-scale`, `contrast-mode`) |
+| HU-28 Accesibilidad | todas (por página) | `atoms/AccessButton.jsx`, `atoms/AccessOpts.jsx`, `atoms/SizeButton.jsx`, `atoms/ContrastButton.jsx`, usados en `organisms/Header2.jsx` e `organisms/IniHeader.jsx` | `accesibilidad.service.js` (`aplicarPreferenciasGuardadas` en `main.jsx`), `localStorage` (`font-scale`, `contrast-mode`), reglas `html.alto-contraste` en `index.css` |
 
 > **Detalles técnicos del mapa:** las imágenes de OpenStreetMap llegan hasta el nivel de zoom 19; por eso la capa usa `maxNativeZoom: 19` con `maxZoom: 20` (en el 20 se amplían las del 19; sin esto el mapa quedaba en blanco). Un `ResizeObserver` llama a `invalidateSize()` cuando cambia el tamaño del contenedor. El mapa va dentro de un contenedor con `isolate`: las capas de Leaflet usan `z-index` de 200 a 1000 y, sin un contexto propio, al hacer scroll se montaban encima del encabezado fijo (`z-50`). `diagnosticarErrorUbicacion()` combina el código del error (1 permiso, 2 no disponible, 3 tiempo agotado), `navigator.permissions.query` y `window.isSecureContext` para explicar la causa real. La ubicación del usuario se considera "dentro del campus" si cae en los límites del mapa más un margen de ~150 m.
 
@@ -353,3 +354,5 @@ Los smoke tests existentes (`npm test`, con `TEST_EMAIL` / `TEST_PASSWORD` en `c
 ### Brechas conocidas del Sprint 5 ⚠️
 
 1. Las pruebas del flujo completo se hicieron en el navegador con la sesión y la base simuladas; la consulta de notificaciones de respuestas se validó aparte contra Supabase (HTTP 200).
+
+> **Revisión completa (23/10/2026):** se corrigió que el foro mostrara "?" como autor de las publicaciones ajenas (faltaba una política de lectura en `profiles`), que el tamaño de texto y el contraste guardados no se aplicaran hasta abrir el panel de accesibilidad, que el modo alto contraste dejara tarjetas claras con texto blanco, que el menú quedara abierto tapando `/LogOut` al cerrar sesión, y que el encabezado se saliera de la pantalla en celular con letra al 150 %. Además, las funciones de trigger ya no se pueden llamar por `/rest/v1/rpc` y `materias_mentoria()` y `eventos_con_cupo` exigen sesión.

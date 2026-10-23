@@ -495,7 +495,7 @@ Quinto sprint del proyecto. Cubre el foro de la comunidad: ver publicaciones, pu
 #### HU-21 · Ver publicaciones del foro
 Como usuario de AGE, quiero ver las preguntas publicadas en el foro y sus respuestas, para poder enterarme de lo que otros ya preguntaron.
 
-- ✔ Listado de preguntas publicadas por los usuarios, de la más reciente a la más antigua, con autor, fecha, número de me gusta y de respuestas. Se muestran 10 y el botón "Mostrar más..." trae las siguientes 10; desaparece cuando ya no hay más
+- ✔ Listado de preguntas publicadas por los usuarios, de la más reciente a la más antigua, con autor, fecha y número de me gusta. Se muestran 10 y el botón "Mostrar más..." trae las siguientes 10; desaparece cuando ya no hay más
 - ✔ Si todavía no hay publicaciones, sale el mensaje "Todavía no hay publicaciones. Sé el primero en preguntar."
 - ✔ Al abrir una publicación se muestra la pregunta del usuario, con título y contenido
 - ✔ Se muestran las respuestas de esa publicación
