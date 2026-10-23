@@ -8,7 +8,7 @@ Aplicación web para estudiantes nuevos de la **Universidad Pontificia Bolivaria
 
 `/client` contiene toda la aplicación del lado del cliente. Es una SPA de React + Vite responsable de toda la interfaz, el enrutamiento, los flujos de autenticación y la comunicación con el backend de Supabase. También es el origen de la compilación para Android, empaquetada con Capacitor.
 
-> **Nota sobre `/server`:** el repositorio tiene una carpeta `/server` con un esqueleto de Express, pero **no se usa**. Expone una única ruta de saludo y no se conecta a nada. El proyecto habla directo con Supabase desde el cliente — Supabase *es* el backend.
+> El proyecto no tiene servidor propio: habla directo con Supabase desde el cliente — Supabase *es* el backend.
 
 ---
 
@@ -19,10 +19,10 @@ Aplicación web para estudiantes nuevos de la **Universidad Pontificia Bolivaria
 - **Mapa del campus** — mapa interactivo (Leaflet + OpenStreetMap) con 35 ubicaciones del campus, posición del usuario en vivo, leyenda de pines, búsqueda dentro del mapa y bloques cercanos
 - **Búsqueda** — busca secciones de la app por palabra clave, con filtro de etiquetas (22 etiquetas)
 - **FAQ** — preguntas cargadas desde la base de datos, cada una con un enlace oficial y un botón "¿Aún con dudas?" que lleva al foro con la pregunta precargada
-- **Foro** — los estudiantes publican preguntas, responden, responden a respuestas (anidadas) y dan like a las publicaciones
+- **Foro** — los estudiantes publican preguntas, responden, responden a respuestas (anidadas) y dan like a las publicaciones; publicaciones y respuestas se cargan por partes ("Mostrar más" / "Cargar más")
 - **Mentores** — directorio filtrable por materia, el contacto abre un chat privado de Microsoft Teams
 - **Actividades** — listado de eventos con cupos reales, inscripción y cancelación
-- **Perfil** — datos del usuario, acceso directo a SIGAA y cierre de sesión
+- **Perfil** — datos del usuario, notificaciones (próximas actividades inscritas y respuestas a sus publicaciones), acceso directo a SIGAA y cierre de sesión
 - **Accesibilidad** — controles de tamaño de texto (A− / A+) y contraste, disponibles desde el encabezado en toda pantalla
 
 ---
@@ -71,7 +71,7 @@ npm install
 
 ### 3. Configurar las variables de entorno
 
-Crear un archivo `.env` dentro de **`client/`** (no en `server/`):
+Crear un archivo `.env` dentro de **`client/`** :
 
 ```
 VITE_SUPABASE_URL=tu_url_de_supabase
@@ -187,20 +187,19 @@ Todo lo que habla con el mundo exterior. Ninguna page o componente consulta Supa
 | `faqs.service.js` | Preguntas del FAQ |
 | `foro.service.js` | Publicaciones, respuestas, respuestas anidadas, likes |
 | `mentores.service.js` | Directorio de mentores, deep link de Teams, registro de contactos |
-| `profesores.service.js` | Directorio de profesores |
 | `eventos.service.js` | Actividades, inscripción y cancelación |
+| `notificaciones.service.js` | Notificaciones del perfil, armadas con inscripciones y respuestas del foro |
 | `ubicaciones.service.js` | Ubicaciones del campus para el mapa |
-| `mapa.service.js` | Cálculos del mapa — distancias, bloques cercanos, leyenda de pines *(sin Supabase)* |
+| `mapa.service.js` | Cálculos del mapa — distancias, bloques cercanos y de la zona visible, leyenda de pines *(sin Supabase)* |
 | `location.service.js` | GPS del dispositivo y permiso en tiempo de ejecución *(sin Supabase)* |
-| `map.service.js` | **Legado**: cargaba el SDK de Google Maps; tras la migración a Leaflet ya no se usa *(sin Supabase)* |
+| `busqueda.service.js` | Búsqueda de secciones y etiquetas compatibles *(sin Supabase)* |
 
-Los últimos tres viven en `/services` pero no tocan la base de datos — la carpeta terminó significando "todo lo que no es interfaz".
+Los tres marcados *(sin Supabase)* viven en `/services` pero no tocan la base de datos — la carpeta terminó significando "todo lo que no es interfaz".
 
 ### Sobre `/data` 📦
 
 - **`searchIndex.json`** — sigue en uso. Indexa las secciones de la app para que `/buscar` las encuentre. Busca *secciones de la app*, no lugares del campus.
 - **`tagList.json`** — las 22 etiquetas que ofrece el filtro de búsqueda.
-- **`markersList.js`** — **legado, ya no se importa.** Las 35 ubicaciones del campus se migraron a la tabla `ubicaciones` de Supabase; el mapa ahora lee de la base de datos. El archivo se conserva solo como referencia y puede borrarse.
 
 ---
 
@@ -216,7 +215,7 @@ Los últimos tres viven en `/services` pero no tocan la base de datos — la car
 | `post` / `respuesta_post` / `likes_post` | Contenido del foro, respuestas y reacciones |
 | `mentores` / `contactos_mentor` | Directorio de mentores y registro de contactos |
 | `eventos` / `inscripciones_evento` | Actividades e inscripciones |
-| `profesores` | Directorio de profesores |
+| `profesores` | Directorio de profesores. **La app ya no lo usa** (la página se quitó el 23/10/2026; AGE es solo para estudiantes); la tabla se conserva |
 
 > **Materias del filtro de mentores:** la política RLS de `mentores` solo deja ver las filas con `activo = true`, así que el cliente no puede saber qué materias se quedaron sin mentor disponible. Para eso existe la función `materias_mentoria()` (`security definer`), que devuelve **solo los nombres** de las materias — nunca datos de mentores inactivos — y permite que el filtro ofrezca una materia sin mentores y se muestre el mensaje correspondiente.
 
@@ -293,10 +292,10 @@ Los smoke tests existentes (`npm test`, con `TEST_EMAIL` / `TEST_PASSWORD` en `c
 |---|---|---|---|
 | HU-08 Ubicación en tiempo real | `/mapa` | `pages/Mapa.jsx`, `organisms/MapInfo.jsx` (botón de ubicación, punto azul, círculo de precisión, seguimiento, aviso con causa y pasos), `atoms/Marker.jsx` (`htmlDeUsuario`) | `location.service.js` (`getUserLocation`, `watchUserLocation`, `diagnosticarErrorUbicacion`), `@capacitor/geolocation` |
 | HU-09 Puntos de interés | `/mapa` | `organisms/MapInfo.jsx` (pines con `L.divIcon`), `pages/Mapa.jsx` (panel lateral de detalle), `atoms/Marker.jsx` (`htmlDePin`) | `ubicaciones.service.js` (`getUbicaciones`, `aPunto`), tabla `ubicaciones` |
-| HU-30 Bloques cercanos | `/mapa` | `pages/Mapa.jsx` (sección "Bloques Cercanos" del panel lateral) | `mapa.service.js` (`bloquesCercanos`, `distanciaEnMetros`) |
+| HU-30 Bloques cercanos | `/mapa` | `pages/Mapa.jsx` (sección "Bloques Cercanos" del panel lateral), `organisms/MapInfo.jsx` (`onVistaCambia`) | `mapa.service.js` (`bloquesCercanos`, `bloquesEnVista`, `distanciaEnMetros`) |
 | HU-35 Leyenda de colores | `/mapa` | `pages/Mapa.jsx` (leyenda sobre el mapa, esquina superior derecha), `atoms/Marker.jsx` (`PIN_COLORS`) | `mapa.service.js` (`PIN_LEYENDA`) |
 | HU-36 Buscar en el mapa | `/mapa` | `pages/Mapa.jsx` (buscador, lista de resultados, `irAlLugar`), `organisms/MapInfo.jsx` (`flyTo` al lugar elegido) | `ubicaciones.service.js` |
-| HU-27 Consultar mi perfil | `/perfil` | `pages/Perfil.jsx`, `atoms/Button.jsx` | `profile.service.js` (`getProfile`), `auth.service.js` (`logout`), tabla `profiles` |
+| HU-27 Consultar mi perfil | `/perfil` | `pages/Perfil.jsx` (datos y lista de notificaciones), `atoms/Button.jsx` | `profile.service.js` (`getProfile`), `notificaciones.service.js` (`getNotificaciones`), `auth.service.js` (`logout`), tabla `profiles` |
 | HU-28 Accesibilidad | todas (por página) | `atoms/AccessButton.jsx`, `atoms/AccessOpts.jsx`, `atoms/SizeButton.jsx`, `atoms/ContrastButton.jsx`, usados en `organisms/Header2.jsx` e `organisms/IniHeader.jsx` | `localStorage` (`font-scale`, `contrast-mode`) |
 
 > **Detalles técnicos del mapa:** las imágenes de OpenStreetMap llegan hasta el nivel de zoom 19; por eso la capa usa `maxNativeZoom: 19` con `maxZoom: 20` (en el 20 se amplían las del 19; sin esto el mapa quedaba en blanco). Un `ResizeObserver` llama a `invalidateSize()` cuando cambia el tamaño del contenedor. El mapa va dentro de un contenedor con `isolate`: las capas de Leaflet usan `z-index` de 200 a 1000 y, sin un contexto propio, al hacer scroll se montaban encima del encabezado fijo (`z-50`). `diagnosticarErrorUbicacion()` combina el código del error (1 permiso, 2 no disponible, 3 tiempo agotado), `navigator.permissions.query` y `window.isSecureContext` para explicar la causa real. La ubicación del usuario se considera "dentro del campus" si cae en los límites del mapa más un margen de ~150 m.
@@ -306,10 +305,10 @@ Los smoke tests existentes (`npm test`, con `TEST_EMAIL` / `TEST_PASSWORD` en `c
 ### Brechas conocidas del Sprint 3 ⚠️
 
 1. **HU-08:** el tiempo de carga (NF-02, ~1,5 s) se midió en escritorio con el servidor de desarrollo, no en un celular con datos móviles. El seguimiento en tiempo real (`watchPosition`) se verificó con Playwright simulando la ubicación (caminata, precisión de computador, fuera del campus, permiso denegado), pero no caminando por el campus con un celular real ni dentro del APK. En Windows, el navegador solo entrega la ubicación si está activada en Configuración → Privacidad y seguridad → Ubicación.
-2. **HU-09:** de las 35 ubicaciones, 15 no tienen `imagen_url`: los 9 puntos de comida, las 4 porterías, `poi-013` (Bulevar Bloque 12) y `poi-017a` (Gimnasio UPB).
-3. **HU-30:** los bloques cercanos se calculan respecto al lugar **elegido** (los 3 más cercanos), no respecto a la zona visible del mapa, y se muestran en el panel lateral, no encima del mapa.
-4. **HU-27:** el "ID" son los primeros 8 caracteres de `profiles.profile_id` (UUID de Supabase Auth), no el ID de estudiante de la UPB, que no existe en la base. Las notificaciones son un texto fijo; no hay tabla ni lógica de notificaciones.
-5. **`map.service.js`** quedó como legado de Google Maps: ya nadie lo importa y se puede borrar.
+2. **HU-09:** de las 35 ubicaciones, 15 no tienen `imagen_url`: los 9 puntos de comida, las 4 porterías, `poi-013` (Bulevar Bloque 12) y `poi-017a` (Gimnasio UPB). Desde el 23/10/2026 el panel muestra el ícono del tipo de lugar con "Sin foto por ahora".
+3. **HU-27:** el "ID" son los primeros 8 caracteres de `profiles.profile_id` (UUID de Supabase Auth), no el ID de estudiante de la UPB, que no existe en la base.
+
+> **Cerradas el 23/10/2026:** HU-30 ya muestra los bloques de la zona visible (`bloquesEnVista`, con la vista que reporta `MapInfo` en cada `moveend`/`resize`), y HU-27 tiene notificaciones reales (`notificaciones.service.js`). `map.service.js` y `markersList.js`, legado de Google Maps, se borraron.
 
 ---
 
@@ -334,3 +333,23 @@ Los smoke tests existentes (`npm test`, con `TEST_EMAIL` / `TEST_PASSWORD` en `c
 
 1. **HU-24:** las 5 actividades de `eventos` son datos de prueba (fechas corridas al 24 oct – 3 nov 2026) y ninguna tiene `imagen_url` propia; se muestra la foto del lugar (`imagen_lugar`).
 2. El flujo de inscripción se probó en el navegador con la sesión y la base simuladas; la regla de cupo y fecha se probó directamente en Supabase.
+
+---
+
+## Sprint 5 — trazabilidad de código 🧭
+
+> Alcance solo del sprint (Foro). Para los criterios de aceptación completos de cada historia, ver la sección **"Sprint 5"** en el `README.md` de la raíz del repo — nada de lo de abajo lo duplica.
+
+| HU | Ruta(s) | Pages / componentes | Servicio / dato |
+|---|---|---|---|
+| HU-21 Ver publicaciones | `/foro` | `pages/Foro.jsx` (listado, `POSTS_POR_PAGINA` = 10, "Mostrar más"), `organisms/ModalForo.jsx` (pregunta, respuestas, "Cargar más" con `RESPUESTAS_POR_PAGINA` = 5) | `foro.service.js` (`getPosts`, `getRespuestas`, `anidarRespuestas`), tablas `post` y `respuesta_post` |
+| HU-22 Publicar una pregunta | `/foro`, `/faqs` | `pages/Foro.jsx` (formulario; recibe la pregunta precargada desde el FAQ) | `foro.service.js` (`createPost`), tabla `post` |
+| HU-23 Responder una publicación | `/foro` | `organisms/ModalForo.jsx` (recuadro de respuesta), `pages/Foro.jsx` (amplía la lista para que la respuesta nueva se vea) | `foro.service.js` (`createRespuesta`), tabla `respuesta_post` |
+| HU-29 Me gusta | `/foro` | `pages/Foro.jsx` (corazón y contador por publicación) | `foro.service.js` (`getLikes`, `toggleLike`), tabla `likes_post` |
+| HU-37 Responder a una respuesta | `/foro` | `organisms/ModalForo.jsx` (aviso "Respondiendo a …"), `organisms/Ans.jsx` ("Responder" por respuesta, sangría `ml-5` con borde izquierdo) | `foro.service.js` (`createRespuesta(postId, contenido, respuestaPadreId)`), columna `respuesta_post.respuesta_padre_id` |
+
+> **Paginación en el cliente:** el foro trae todas las publicaciones y respuestas en una consulta y las recorta en pantalla. Con el volumen esperado de un curso es más simple y rápido que paginar en la base; si el foro creciera mucho, `getPosts` debería pasar a `.range()`.
+
+### Brechas conocidas del Sprint 5 ⚠️
+
+1. Las pruebas del flujo completo se hicieron en el navegador con la sesión y la base simuladas; la consulta de notificaciones de respuestas se validó aparte contra Supabase (HTTP 200).

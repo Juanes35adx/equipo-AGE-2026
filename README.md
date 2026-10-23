@@ -289,10 +289,10 @@ Tercer sprint del proyecto. Cubre el mapa interactivo del campus (ubicación en 
 |---|---|---|---|
 | HU-08 | Ubicación en tiempo real en el campus | Mapa Interactivo | ⚠ Cumplida con notas (ver detalle) |
 | HU-09 | Puntos de interés en el mapa | Mapa Interactivo | ⚠ Cumplida con notas (ver detalle) |
-| HU-30 | Bloques cercanos en el mapa | Mapa Interactivo | ⚠ Cumplida con notas (ver detalle) |
+| HU-30 | Bloques cercanos en el mapa | Mapa Interactivo | ✔ Cumplida |
 | HU-35 | Leyenda de colores del mapa | Mapa Interactivo | ✔ Cumplida |
 | HU-36 | Buscar un lugar dentro del mapa | Mapa Interactivo | ✔ Cumplida |
-| HU-27 | Consultar mi perfil | Inicio | ⚠ Cumplida con notas (ver detalle) |
+| HU-27 | Consultar mi perfil | Inicio | ✔ Cumplida, con nota (ver detalle) |
 | HU-28 | Ajustes de accesibilidad | Accesibilidad | ✔ Cumplida |
 
 ✔ = verificado contra el código y la base de datos · ⚠ = funciona, con una diferencia honesta frente al criterio original (explicada abajo)
@@ -321,14 +321,15 @@ Como usuario de AGE, quiero hacer clic en los puntos de interés del mapa, para 
 - ✔ Al hacer clic en un marcador se despliega su información en el panel lateral
 - ✔ Los puntos están clasificados por tipo: 22 bloques, 9 de comida y 4 porterías
 - ✔ La información se carga desde la tabla `ubicaciones` de Supabase
-- ⚠ **Nota honesta:** el criterio pide nombre, descripción corta **e imagen** en cada punto. Los 35 tienen nombre y descripción, pero solo **20 tienen imagen**: faltan los 9 puntos de comida, las 4 porterías, el Bulevar Bloque 12 y el Gimnasio UPB. En esos casos el panel muestra la información sin foto.
+- ⚠ **Nota honesta:** el criterio pide nombre, descripción corta **e imagen** en cada punto. Los 35 tienen nombre y descripción, pero solo **20 tienen foto**: faltan los 9 puntos de comida, las 4 porterías, el Bulevar Bloque 12 y el Gimnasio UPB. **Desde el 23/10/2026** esos lugares muestran en el panel el ícono de su tipo con el texto "Sin foto por ahora", en vez de quedar sin imagen; falta tomar las fotos reales.
 
 #### HU-30 · Bloques cercanos en el mapa
 Como usuario de AGE, quiero ver los bloques cercanos sobre el mapa, para poder reconocer qué tengo alrededor. Origen: imagen de diseño `mapa.png`.
 
 - ✔ Sección "Bloques Cercanos" con fotografías de los bloques y su distancia en metros
 - ✔ Al pulsar un bloque cercano, el mapa se centra en él y abre su detalle
-- ⚠ **Nota honesta:** los criterios piden un panel **sobre el mapa** con los bloques **de la zona visible**. Lo implementado es distinto: la sección aparece en el panel lateral, al lado del mapa, después de elegir un lugar, y muestra los **3 bloques más cercanos a ese lugar** (distancia calculada con la fórmula de Haversine). No depende de la zona visible del mapa.
+- ✔ Muestra los bloques **de la zona visible**: sin elegir un lugar, la sección lista los 3 bloques que se ven en el mapa, ordenados por cercanía al centro de la vista, y se actualiza cada vez que se mueve o se acerca el mapa ("En la zona que estás viendo del mapa"). Al elegir un lugar, muestra los 3 más cercanos a ese lugar (fórmula de Haversine). Corregido el 23/10/2026.
+- Nota: la sección va en el panel lateral, junto al mapa, y no flotando encima de él, para no tapar los pines en pantallas pequeñas.
 
 #### HU-35 · Leyenda de colores del mapa
 Como usuario de AGE, quiero una leyenda que explique el color de cada pin, para poder interpretar el mapa sin tener que adivinar. Origen: Mural, columna "Mapa".
@@ -352,7 +353,8 @@ Como usuario de AGE, quiero ver mis datos y mis notificaciones en mi perfil, par
 - ✔ Muestra Nombre, Correo, Cursando (programa) e ID del usuario, además del semestre
 - ✔ Botón "Cerrar Sesión"
 - ✔ Botón "SIGAA" que abre la plataforma institucional
-- ⚠ **Nota honesta:** el "ID" que se muestra son los primeros 8 caracteres del identificador interno de la cuenta en Supabase, no el ID de estudiante de la UPB (la base no guarda ese dato y el registro no lo pide). El área de notificaciones existe, pero siempre dice "No tienes ninguna notificación!": todavía no hay un sistema de notificaciones que la llene.
+- ✔ Notificaciones reales (23/10/2026): el perfil muestra las próximas actividades a las que el usuario está inscrito y las respuestas que otros dejaron en sus publicaciones del foro en los últimos 14 días. Cada notificación lleva a su sección (Actividades o Foro).
+- ⚠ **Nota honesta:** el "ID" que se muestra son los primeros 8 caracteres del identificador interno de la cuenta en Supabase, no el ID de estudiante de la UPB (la base no guarda ese dato y el registro no lo pide).
 
 #### HU-28 · Ajustes de accesibilidad
 Como usuario de AGE, quiero ajustar el tamaño del texto y el contraste, para poder leer la aplicación con comodidad. Origen: imagen de diseño `Accesibilidad.png`.
@@ -467,3 +469,80 @@ Como usuario de AGE, quiero cancelar mi inscripción a una actividad, para poder
 4. Pulsar + y elegir "ayuda" (3 secciones), luego "preguntas" (2) y "faq" (1). Con "ayuda" elegida, "mapa" aparece tachada. Quitar una etiqueta con su ×.
 5. Entrar a "Actividades": cada tarjeta tiene foto, lugar, fecha, cupos y "¿No sabes cómo llegar?". No aparecen actividades que ya pasaron.
 6. Abrir "Mas Información" y pulsar "Participar": el botón pasa a "Cancelar inscripción" y la confirmación aparece dentro del modal. Cancelar y ver que vuelve "Participar".
+
+---
+
+## Sprint 5 — Foro
+
+Quinto sprint del proyecto. Cubre el foro de la comunidad: ver publicaciones, publicar una pregunta, responder, responder a una respuesta y dar me gusta. Se cerró el 23 de octubre de 2026. Todo lo de esta sección describe **únicamente el Sprint 5**; el resto del documento no cambia.
+
+**Épica:** Comunidad y Soporte
+
+### Historias de usuario del sprint
+
+| HU | Historia | Épica | Estado |
+|---|---|---|---|
+| HU-21 | Ver publicaciones del foro | Comunidad y Soporte | ✔ Cumplida |
+| HU-22 | Publicar una pregunta en el foro | Comunidad y Soporte | ✔ Cumplida |
+| HU-23 | Responder una publicación del foro | Comunidad y Soporte | ✔ Cumplida |
+| HU-29 | Reaccionar a una publicación del foro | Comunidad y Soporte | ✔ Cumplida |
+| HU-37 | Responder a una respuesta del foro | Comunidad y Soporte | ✔ Cumplida |
+
+✔ = verificado contra el código, la base de datos y pruebas en el navegador
+
+### Detalle por historia
+
+#### HU-21 · Ver publicaciones del foro
+Como usuario de AGE, quiero ver las preguntas publicadas en el foro y sus respuestas, para poder enterarme de lo que otros ya preguntaron.
+
+- ✔ Listado de preguntas publicadas por los usuarios, de la más reciente a la más antigua, con autor, fecha, número de me gusta y de respuestas. Se muestran 10 y el botón "Mostrar más..." trae las siguientes 10; desaparece cuando ya no hay más
+- ✔ Si todavía no hay publicaciones, sale el mensaje "Todavía no hay publicaciones. Sé el primero en preguntar."
+- ✔ Al abrir una publicación se muestra la pregunta del usuario, con título y contenido
+- ✔ Se muestran las respuestas de esa publicación
+- ✔ Botón "Cargar más" para traer más respuestas: se ven 5 al inicio y cada pulsación trae 5 más, con el texto "Mostrando X de Y respuestas"
+
+#### HU-22 · Publicar una pregunta en el foro
+Como usuario de AGE, quiero publicar una pregunta en el foro, para poder resolver una duda que no encontré en las preguntas frecuentes.
+
+- ✔ Opción para crear una publicación nueva en la parte superior del foro
+- ✔ Formulario con título y contenido de la pregunta; desde el FAQ ("¿Aún con dudas?") llega con la pregunta precargada
+- ✔ La publicación queda asociada al usuario que la creó (`post.id_usuario`) y se muestra su nombre
+- ✔ Tras publicar, la pregunta aparece de primera en el listado del foro
+
+#### HU-23 · Responder una publicación del foro
+Como usuario de AGE, quiero responder la pregunta de otro estudiante, para poder ayudar con lo que ya sé.
+
+- ✔ Recuadro para escribir la respuesta dentro de la publicación
+- ✔ La respuesta queda asociada al usuario que la escribió (`respuesta_post.id_usuario`)
+- ✔ Al enviarla aparece en la lista de respuestas de esa publicación, aunque la lista estuviera recortada por "Cargar más"
+- ✔ El autor de la publicación ve la respuesta como notificación en su perfil (HU-27)
+
+#### HU-29 · Reaccionar a una publicación del foro
+Como usuario de AGE, quiero marcar con me gusta una publicación del foro, para poder señalar la que me pareció útil.
+
+- ✔ Botón de me gusta visible en cada publicación
+- ✔ Al pulsarlo la publicación queda marcada y el contador sube en 1
+- ✔ Al pulsarlo de nuevo se quita la marca y el contador baja
+- ✔ La marca se conserva entre sesiones: se guarda en la tabla `likes_post`, no en el navegador
+- ✔ Se muestra el número de me gusta de cada publicación
+
+#### HU-37 · Responder a una respuesta del foro
+Como usuario de AGE, quiero responder a la respuesta de otro usuario, para poder continuar la conversación sobre ese punto en concreto.
+
+- ✔ Botón "Responder" en cada respuesta; al pulsarlo aparece el aviso "Respondiendo a …" con opción de cancelar
+- ✔ La respuesta anidada se muestra bajo la respuesta original
+- ✔ Se distingue visualmente de las respuestas de primer nivel: va con sangría y una línea a la izquierda
+- ✔ La tabla `respuesta_post` admite referencia a la respuesta padre (`respuesta_padre_id`)
+
+### Cómo se verificó
+
+27 pruebas en el navegador con Playwright el 23/10/2026, con la sesión y la base simuladas: listado de 10 con "Mostrar más", publicar, abrir una publicación con 8 respuestas ("Cargar más" de 5 en 5), responder, responder a una respuesta, me gusta y quitarlo con su contador, notificaciones del perfil, bloques de la zona visible del mapa, lugar sin foto y registro sin selector de rol. Además, `npx eslint src` sin errores y `npm run build` correcto.
+
+### Cómo verificar el Sprint 5 a mano
+
+1. `cd client; npm install; npm run dev`, iniciar sesión y entrar a "Foro" desde el menú.
+2. Escribir un título y una pregunta y pulsar "Publicar": aparece de primera con tu nombre.
+3. Pulsar "Responder" en una publicación: se abre con la pregunta y sus respuestas. Escribir una respuesta y publicarla.
+4. Pulsar "Responder" sobre una respuesta: sale "Respondiendo a …"; al publicar, la respuesta queda con sangría debajo de la original.
+5. Pulsar el corazón de una publicación: se marca y el número sube. Cerrar sesión, volver a entrar y ver que sigue marcada. Pulsarlo de nuevo para quitarlo.
+6. Con otra cuenta, responder una publicación de la primera: en el Perfil de la primera aparece la notificación.
