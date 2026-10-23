@@ -26,8 +26,10 @@ export default function SidebarNav({ isOpen, onClose, onNavigate }) {
   const sidebarRef = useRef(null);
   const navigate = useNavigate();
 
+  // El menú vive fuera de las rutas: si no se cierra, su capa queda encima de /LogOut y tapa "Regresar".
   const handleLogout = async () => {
       await logout();
+      onClose();
       navigate("/LogOut");
     };
 
@@ -105,11 +107,13 @@ export default function SidebarNav({ isOpen, onClose, onNavigate }) {
               </li>
               
             ))}
-            <Button 
-                  text="Cerrar Sesión"
-                  onClick={handleLogout}
-                  variant="menu"
-                />
+            <li>
+              <Button
+                text="Cerrar Sesión"
+                onClick={handleLogout}
+                variant="menu"
+              />
+            </li>
           </ul>
         </div>
       </nav>
