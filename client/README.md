@@ -71,7 +71,13 @@ npm install
 
 ### 3. Configurar las variables de entorno
 
-Crear un archivo `.env` dentro de **`client/`** :
+Copiar `.env.example` como `.env` dentro de **`client/`** y completar los valores:
+
+```bash
+cp .env.example .env
+```
+
+El archivo debe quedar así:
 
 ```
 VITE_SUPABASE_URL=tu_url_de_supabase
